@@ -3,11 +3,11 @@ var Span = require('./span')
 var eventPairs = [
   ['domainLookupStart', 'domainLookupEnd', 'Domain lookup'],
   ['connectStart', 'connectEnd', 'Making a connection to the server'],
-  ['requestStart', 'responseStart', 'Requesting the document, Waiting for the first byte'],
+  ['requestStart', 'responseStart', 'Requesting the document, waiting for the first byte'],
   ['responseStart', 'responseEnd', 'Receiving the document'],
-  ['domLoading', 'domInteractive', 'Parsing the document, Creating DOM/CSSOM, Executing sync. scripts'],
-  ['domContentLoadedEventStart', 'domContentLoadedEventEnd', 'Executing "DOMContentLoaded" event listeners'],
-  ['loadEventStart', 'loadEventEnd', 'Executing "load" event listeners']
+  ['domLoading', 'domInteractive', 'Parsing the document, executing sync. scripts'],
+  ['domContentLoadedEventStart', 'domContentLoadedEventEnd', 'Fire "DOMContentLoaded" event'],
+  ['loadEventStart', 'loadEventEnd', 'Fire "load" event']
 ]
 
 var navigationTimingKeys = [
