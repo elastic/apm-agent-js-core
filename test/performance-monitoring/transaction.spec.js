@@ -78,40 +78,6 @@ describe('transaction.Transaction', function () {
     })
   })
 
-  it('should generate stacktrace based on transaction options', function (done) {
-    var tr = new Transaction('/', 'transaction', {'enableStackFrames': true})
-    var trPromise = new Promise(function (resolve, reject) {
-      tr.doneCallback = function () {
-        // expect(firstSpan.frames).not.toBeUndefined()
-        expect(secondSpan.frames).toBeUndefined()
-        resolve()
-      }
-    })
-
-    var firstSpan = tr.startSpan('first-span-signature', 'first-span')
-    firstSpan.end()
-
-    var secondSpan = tr.startSpan('second-span', 'second-span', {'enableStackFrames': false})
-    secondSpan.end()
-
-    var noStackTrace = new Transaction('/', 'transaction', {'enableStackFrames': false})
-    var thirdSpan = noStackTrace.startSpan('third-span', 'third-span', {'enableStackFrames': true})
-    thirdSpan.end()
-
-    var noStackTracePromise = new Promise(function (resolve, reject) {
-      noStackTrace.doneCallback = function () {
-        expect(thirdSpan.frames).toBeUndefined()
-        resolve()
-      }
-    })
-
-    Promise.all([trPromise, noStackTracePromise]).then(function () {
-      done()
-    })
-
-    tr.detectFinish()
-    noStackTrace.detectFinish()
-  })
   it('should not generate stacktrace if the option is not passed', function (done) {
     var tr = new Transaction('/', 'transaction')
     tr.doneCallback = function () {
@@ -119,7 +85,7 @@ describe('transaction.Transaction', function () {
       expect(secondSpan.frames).toBeUndefined()
       done()
     }
-    var firstSpan = tr.startSpan('first-span-signature', 'first-span', {'enableStackFrames': true})
+    var firstSpan = tr.startSpan('first-span-signature', 'first-span')
     firstSpan.end()
 
     var secondSpan = tr.startSpan('second-span', 'second-span')

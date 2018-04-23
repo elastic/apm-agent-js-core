@@ -11,17 +11,13 @@ var eventPairs = [
   ['loadEventStart', 'loadEventEnd', 'Fire "load" event']
 ]
 
-var navigationTimingKeys = [
-  'navigationStart', 'unloadEventStart', 'unloadEventEnd', 'redirectStart', 'redirectEnd', 'fetchStart', 'domainLookupStart', 'domainLookupEnd', 'connectStart',
-  'connectEnd', 'secureConnectionStart', 'requestStart', 'responseStart', 'responseEnd', 'domLoading', 'domInteractive', 'domContentLoadedEventStart', 'domContentLoadedEventEnd', 'domComplete', 'loadEventStart', 'loadEventEnd']
-
 var spanThreshold = 5 * 60 * 1000 // 5 minutes
 function isValidSpan (transaction, span) {
   var d = span.duration()
   return (d < spanThreshold && d > 0 && span._start <= transaction._rootSpan._end && span._end <= transaction._rootSpan._end)
 }
 
-module.exports = function captureHardNavigation (transaction) {
+function captureHardNavigation (transaction) {
   if (transaction.isHardNavigation && window.performance && window.performance.timing) {
     var baseTime = window.performance.timing.fetchStart
     var timings = window.performance.timing
@@ -50,7 +46,9 @@ module.exports = function captureHardNavigation (transaction) {
 
       var ajaxUrls = transaction.spans
         .filter(function (span) { return span.type.indexOf('ext.HttpRequest') > -1 })
-        .map(function (span) { return span.signature.split(' ')[1] })
+        .map(function (span) {
+          return span.signature.split(' ')[1]
+        })
 
       for (i = 0; i < entries.length; i++) {
         var entry = entries[i]
@@ -101,17 +99,14 @@ module.exports = function captureHardNavigation (transaction) {
     var marks = {
       agent: {
         timeToComplete: transaction._rootSpan._end
-      },
-      navigationTiming: {}
-    }
-    var navigationStart = window.performance.timing.navigationStart
-    navigationTimingKeys.forEach(function (timingKey) {
-      var m = timings[timingKey]
-      if (m) {
-        marks.navigationTiming[timingKey] = m - navigationStart
       }
-    })
+    }
+    transaction.addNavigationTimingMarks()
     transaction.addMarks(marks)
   }
   return 0
+}
+
+module.exports = {
+  captureHardNavigation: captureHardNavigation
 }

@@ -28,9 +28,9 @@ describe('TransactionService', function () {
   it('should call startSpan on current Transaction', function () {
     var tr = new Transaction('transaction', 'transaction')
     spyOn(tr, 'startSpan').and.callThrough()
-    transactionService.setZoneTransaction(tr)
+    transactionService.setCurrentTransaction(tr)
     transactionService.startSpan('test-span', 'test-span')
-    expect(transactionService.getZoneTransaction().startSpan).toHaveBeenCalledWith('test-span', 'test-span', undefined)
+    expect(transactionService.getCurrentTransaction().startSpan).toHaveBeenCalledWith('test-span', 'test-span')
   })
 
   it('should not start span when performance monitoring is disabled', function () {
@@ -38,9 +38,9 @@ describe('TransactionService', function () {
     transactionService = new TransactionService(logger, config)
     var tr = new Transaction('transaction', 'transaction')
     spyOn(tr, 'startSpan').and.callThrough()
-    transactionService.setZoneTransaction(tr)
+    transactionService.setCurrentTransaction(tr)
     transactionService.startSpan('test-span', 'test-span')
-    expect(transactionService.getZoneTransaction().startSpan).not.toHaveBeenCalled()
+    expect(transactionService.getCurrentTransaction().startSpan).not.toHaveBeenCalled()
   })
 
   it('should not start transaction when performance monitoring is disabled', function () {
@@ -84,7 +84,7 @@ describe('TransactionService', function () {
     transactionService = new TransactionService(logger, config)
 
     var span = transactionService.startSpan('testSpan', 'testtype')
-    var trans = transactionService.getZoneTransaction()
+    var trans = transactionService.getCurrentTransaction()
     expect(trans.name).toBe('ZoneTransaction')
     transactionService.startTransaction('transaction', 'transaction')
     expect(trans.name).toBe('transaction')
@@ -144,13 +144,15 @@ describe('TransactionService', function () {
 
     transactionService.subscribe(function () {
       expect(tr.isHardNavigation).toBe(true)
+      expect(tr.marks.agent).toBeDefined()
+      expect(tr.marks.navigationTiming).toBeDefined()
       done()
     })
     var tr = transactionService.sendPageLoadMetrics('test')
 
     transactionService = new TransactionService(logger, config)
     var zoneTr = new Transaction('ZoneTransaction', 'zone-transaction')
-    transactionService.setZoneTransaction(zoneTr)
+    transactionService.setCurrentTransaction(zoneTr)
 
     var pageLoadTr = transactionService.sendPageLoadMetrics('new tr')
 
@@ -201,7 +203,7 @@ describe('TransactionService', function () {
 
           var xhrTask = {source: 'XMLHttpRequest.send', XHR: {url: testUrl,method: 'GET'}}
           var spanSignature = xhrTask.XHR.method + ' ' + testUrl
-          var span = transactionService.startSpan(spanSignature, 'ext.HttpRequest', {'enableStackFrames': false})
+          var span = transactionService.startSpan(spanSignature, 'ext.HttpRequest')
           span.end()
         })
       }
@@ -227,7 +229,7 @@ describe('TransactionService', function () {
     })
 
     var zoneTr = new Transaction('ZoneTransaction', 'zone-transaction')
-    transactionService.setZoneTransaction(zoneTr)
+    transactionService.setCurrentTransaction(zoneTr)
     var span = zoneTr.startSpan('GET http://example.com', 'ext.HttpRequest')
     span.end()
     var tr = transactionService.sendPageLoadMetrics('resource-test')

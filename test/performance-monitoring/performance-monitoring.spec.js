@@ -82,7 +82,7 @@ describe('PerformanceMonitoring', function () {
   })
 
   it('should group small continuously similar spans', function () {
-    var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
+    var tr = new Transaction('transaction', 'transaction')
     var span1 = tr.startSpan('signature', 'type')
     span1.end()
     var span2 = tr.startSpan('signature', 'type')
@@ -126,7 +126,7 @@ describe('PerformanceMonitoring', function () {
   })
 
   it('should calculate browser responsiveness', function () {
-    var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
+    var tr = new Transaction('transaction', 'transaction', {})
     tr.end()
 
     tr._rootSpan._start = 1

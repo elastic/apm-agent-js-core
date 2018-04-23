@@ -47,6 +47,25 @@ function sanitizeObjectStrings (obj, limit, required, placeholder) {
   return obj
 }
 
+var navigationTimingKeys = [
+  'navigationStart', 'unloadEventStart', 'unloadEventEnd', 'redirectStart', 'redirectEnd', 'fetchStart', 'domainLookupStart', 'domainLookupEnd', 'connectStart',
+  'connectEnd', 'secureConnectionStart', 'requestStart', 'responseStart', 'responseEnd', 'domLoading', 'domInteractive', 'domContentLoadedEventStart', 'domContentLoadedEventEnd', 'domComplete', 'loadEventStart', 'loadEventEnd']
+
+function getNavigationTimingMarks () {
+  if (window.performance && window.performance.timing) {
+    var timing = window.performance.timing
+    var marks = {}
+    var navigationStart = timing.navigationStart
+    navigationTimingKeys.forEach(function (timingKey) {
+      var m = timing[timingKey]
+      if (m) {
+        marks[timingKey] = m - navigationStart
+      }
+    })
+    return marks
+  }
+}
+
 module.exports = {
   getViewPortInfo: function getViewPort () {
     var e = document.documentElement
@@ -311,7 +330,8 @@ module.exports = {
   isPlatformSupported: isPlatformSupported,
 
   sanitizeString: sanitizeString,
-  sanitizeObjectStrings: sanitizeObjectStrings
+  sanitizeObjectStrings: sanitizeObjectStrings,
+  getNavigationTimingMarks: getNavigationTimingMarks
 }
 
 function isObject (value) {

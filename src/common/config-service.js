@@ -19,7 +19,6 @@ function Config () {
     browserResponsivenessBuffer: 3,
     checkBrowserResponsiveness: true,
     enable: true,
-    enableStackFrames: false,
     groupSimilarSpans: true,
     similarSpanThreshold: 0.05,
     captureInteractions: false,

@@ -33,9 +33,9 @@ describe('ZoneTransactionService', function () {
   it('should call startSpan on current Transaction', function () {
     var tr = new Transaction('transaction', 'transaction')
     spyOn(tr, 'startSpan').and.callThrough()
-    transactionService.setZoneTransaction(tr)
+    transactionService.setCurrentTransaction(tr)
     transactionService.startSpan('test-span', 'test-span')
-    expect(transactionService.getZoneTransaction().startSpan).toHaveBeenCalledWith('test-span', 'test-span', undefined)
+    expect(transactionService.getCurrentTransaction().startSpan).toHaveBeenCalledWith('test-span', 'test-span')
   })
 
   it('should not start span when performance monitoring is disabled', function () {
@@ -43,9 +43,9 @@ describe('ZoneTransactionService', function () {
     transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
     var tr = new Transaction('transaction', 'transaction')
     spyOn(tr, 'startSpan').and.callThrough()
-    transactionService.setZoneTransaction(tr)
+    transactionService.setCurrentTransaction(tr)
     transactionService.startSpan('test-span', 'test-span')
-    expect(transactionService.getZoneTransaction().startSpan).not.toHaveBeenCalled()
+    expect(transactionService.getCurrentTransaction().startSpan).not.toHaveBeenCalled()
   })
 
   it('should not start transaction when performance monitoring is disabled', function () {
@@ -84,7 +84,7 @@ describe('ZoneTransactionService', function () {
     transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
 
     var span = transactionService.startSpan('testSpan', 'testtype')
-    var trans = transactionService.getZoneTransaction()
+    var trans = transactionService.getCurrentTransaction()
     expect(trans.name).toBe('ZoneTransaction')
     transactionService.startTransaction('transaction', 'transaction')
     expect(trans.name).toBe('transaction')
@@ -107,7 +107,7 @@ describe('ZoneTransactionService', function () {
 
   it('should call startSpan on current Transaction', function () {
     var tr = new Transaction('transaction', 'transaction')
-    transactionService.setZoneTransaction(tr)
+    transactionService.setCurrentTransaction(tr)
     expect(tr._scheduledTasks).toEqual({})
     zoneServiceMock.spec.onScheduleTask({source: 'setTimeout',taskId: 'setTimeout1'})
     zoneServiceMock.spec.onScheduleTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'url'}})
@@ -123,22 +123,22 @@ describe('ZoneTransactionService', function () {
   it('should remove XHR query string by default', function () {
     expect(config.get('includeXHRQueryString')).toBe(false)
     var tr = new Transaction('transaction', 'transaction')
-    transactionService.setZoneTransaction(tr)
+    transactionService.setCurrentTransaction(tr)
     spyOn(transactionService, 'startSpan').and.callThrough()
 
     zoneServiceMock.spec.onScheduleTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'http://test.com/path?key=value'}})
-    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path', 'ext.HttpRequest', jasmine.objectContaining({ enableStackFrames: false }))
+    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path', 'ext.HttpRequest')
   })
 
   it('should check includeXHRQueryString config', function () {
     config.set('includeXHRQueryString', true)
     expect(config.get('includeXHRQueryString')).toBe(true)
     var tr = new Transaction('transaction', 'transaction')
-    transactionService.setZoneTransaction(tr)
+    transactionService.setCurrentTransaction(tr)
     spyOn(transactionService, 'startSpan').and.callThrough()
 
     zoneServiceMock.spec.onScheduleTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'http://test.com/path?key=value'}})
-    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path?key=value', 'ext.HttpRequest', jasmine.objectContaining({ enableStackFrames: false }))
+    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path?key=value', 'ext.HttpRequest')
   })
 
   it('should call detectFinish onInvokeEnd', function () {
@@ -154,7 +154,7 @@ describe('ZoneTransactionService', function () {
 
   it('should end the span if onInvokeTask is called first', function () {
     var tr = new Transaction('transaction', 'transaction')
-    transactionService.setZoneTransaction(tr)
+    transactionService.setCurrentTransaction(tr)
     var task = {source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'http://test.com/path?key=value'}}
     zoneServiceMock.spec.onScheduleTask(task)
     expect(task.span).toBeDefined()
@@ -208,7 +208,7 @@ describe('ZoneTransactionService', function () {
 
     transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
     var zoneTr = new Transaction('ZoneTransaction', 'zone-transaction')
-    transactionService.setZoneTransaction(zoneTr)
+    transactionService.setCurrentTransaction(zoneTr)
 
     var pageLoadTr = transactionService.sendPageLoadMetrics('new tr')
 
@@ -284,7 +284,7 @@ describe('ZoneTransactionService', function () {
     })
 
     var zoneTr = new Transaction('ZoneTransaction', 'zone-transaction')
-    transactionService.setZoneTransaction(zoneTr)
+    transactionService.setCurrentTransaction(zoneTr)
     var span = zoneTr.startSpan('GET http://example.com', 'ext.HttpRequest')
     span.end()
     var tr = transactionService.sendPageLoadMetrics('resource-test')

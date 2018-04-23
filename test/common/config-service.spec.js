@@ -33,20 +33,6 @@ describe('ConfigService', function () {
     expect(configService.get('serviceName')).toBe(null)
   })
 
-  xit('should deep merge configs', function () {
-    expect(configService.get('performance.enable')).toBe(true)
-    expect(configService.get('performance.enableStackFrames')).toBe(false)
-
-    configService.setConfig({
-      performance: {
-        enableStackFrames: true
-      }
-    })
-
-    expect(configService.get('performance.enable')).toBe(true)
-    expect(configService.get('performance.enableStackFrames')).toBe(true)
-  })
-
   it('should return undefined if the config does not exists', function () {
     expect(configService.get('context')).toEqual({})
     expect(configService.get('context.user')).toBe(undefined)

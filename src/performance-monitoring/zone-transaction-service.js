@@ -28,7 +28,7 @@ class ZoneTransactionService extends TransactionService {
           spanSignature = spanSignature + parsed.path
         }
 
-        var span = transactionService.startSpan(spanSignature, 'ext.HttpRequest', {'enableStackFrames': false})
+        var span = transactionService.startSpan(spanSignature, 'ext.HttpRequest')
         task.span = span
       } else if (task.type === 'interaction') {
         if (typeof transactionService.interactionStarted === 'function') {
