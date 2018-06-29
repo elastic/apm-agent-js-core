@@ -27,6 +27,7 @@ class ApmServer {
 
     this.initErrorQueue()
     this.initTransactionQueue()
+    this.initBeforeUnloadListener()
   }
 
   createServiceObject () {
@@ -150,6 +151,22 @@ class ApmServer {
         interval: interval
       })
   }
+
+  initBeforeUnloadListener () {
+    var self = this
+
+    window.addEventListener('beforeunload', function () {
+      if (self._configService.isActive()) {
+        if (self.transactionQueue) {
+          self.transactionQueue.flush()
+        }
+        if (self.errorQueue) {
+          self.errorQueue.flush()
+        }
+      }
+    })
+  }
+
   addError (error) {
     if (this._configService.isActive()) {
       if (!this.errorQueue) {
