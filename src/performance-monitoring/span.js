@@ -13,6 +13,14 @@ class Span {
     }
     this.name = name
     this.type = type
+    this.subType = undefined
+    this.action = undefined
+    if (type.indexOf('.') !== -1) {
+      var fields = type.split('.', 3)
+      this.type = fields[0]
+      this.subType = fields[1]
+      this.action = fields[2]
+    }
     this.ended = false
     this._end = undefined
     this.context = undefined
