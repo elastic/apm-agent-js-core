@@ -149,7 +149,7 @@ describe('transaction.Transaction', function () {
     var span = transaction.startSpan('test', 'test')
     span.end()
     span._end += 100
-    span = transaction.startSpan('test', 'ext.HttpRequest')
+    span = transaction.startSpan('test', 'external.http')
 
     span.end()
     span._start = 10000000

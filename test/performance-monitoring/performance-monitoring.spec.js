@@ -396,7 +396,7 @@ describe('PerformanceMonitoring', function () {
             done()
           });
         })
-      expect(transactionService.startSpan).toHaveBeenCalledWith('GET /', 'ext.HttpRequest')
+      expect(transactionService.startSpan).toHaveBeenCalledWith('GET /', 'external.http')
     })
 
     it('should not duplicate xhr spans if fetch is a polyfill', function (done) {

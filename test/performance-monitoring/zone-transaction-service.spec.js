@@ -119,7 +119,7 @@ describe('ZoneTransactionService', function () {
     spyOn(transactionService, 'startSpan').and.callThrough()
 
     zoneServiceMock.spec.onScheduleTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'http://test.com/path?key=value'}})
-    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path', 'ext.HttpRequest')
+    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path', 'external.http')
   })
 
   it('should check includeXHRQueryString config', function () {
@@ -130,7 +130,7 @@ describe('ZoneTransactionService', function () {
     spyOn(transactionService, 'startSpan').and.callThrough()
 
     zoneServiceMock.spec.onScheduleTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'http://test.com/path?key=value'}})
-    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path?key=value', 'ext.HttpRequest')
+    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path?key=value', 'external.http')
   })
 
   it('should call detectFinish onInvokeEnd', function () {
@@ -262,7 +262,7 @@ describe('ZoneTransactionService', function () {
 
     var zoneTr = new Transaction('ZoneTransaction', 'zone-transaction')
     transactionService.setCurrentTransaction(zoneTr)
-    var span = zoneTr.startSpan('GET http://example.com', 'ext.HttpRequest')
+    var span = zoneTr.startSpan('GET http://example.com', 'external.http')
     span.end()
     var tr = transactionService.sendPageLoadMetrics('resource-test')
   })

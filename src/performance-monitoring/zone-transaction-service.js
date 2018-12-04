@@ -27,7 +27,7 @@ class ZoneTransactionService extends TransactionService {
           spanName = spanName + parsed.path
         }
 
-        var span = transactionService.startSpan(spanName, 'ext.HttpRequest')
+        var span = transactionService.startSpan(spanName, 'external.http')
         task.span = span
       } else if (task.type === 'interaction') {
         if (typeof transactionService.interactionStarted === 'function') {

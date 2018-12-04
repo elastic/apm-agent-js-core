@@ -38,7 +38,7 @@ class PerformanceMonitoring {
       ) {
         if (event === patchUtils.SCHEDULE && task.data) {
           var spanName = task.data.method + ' ' + task.data.url
-          var span = transactionService.startSpan(spanName, 'ext.HttpRequest')
+          var span = transactionService.startSpan(spanName, 'external.http')
           if (span) {
             var isDtEnabled = configService.get('distributedTracing')
             var origins = configService.get('distributedTracingOrigins')
@@ -170,6 +170,8 @@ class PerformanceMonitoring {
         trace_id: transaction.traceId,
         name: utils.sanitizeString(span.name, stringLimit, true),
         type: utils.sanitizeString(span.type, stringLimit, true),
+        subType: utils.sanitizeString(span.subType, stringLimit, true),
+        action: utils.sanitizeString(span.action, stringLimit, true),
         start: span._start - transactionStart,
         duration: span.duration(),
         context: context
@@ -229,6 +231,8 @@ class PerformanceMonitoring {
 
         var isContinuouslySimilar =
           lastSpan.type === span.type &&
+          lastSpan.subType === span.subType &&
+          lastSpan.action === span.action &&
           lastSpan.name === span.name &&
           span.duration() / transDuration < threshold &&
           (span._start - lastSpan._end) / transDuration < threshold

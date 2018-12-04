@@ -132,7 +132,7 @@ function captureHardNavigation (transaction) {
 
       var ajaxUrls = transaction.spans
         .filter(function (span) {
-          return span.type.indexOf('ext.HttpRequest') > -1
+          return span.type === 'external' && span.subType === 'http'
         })
         .map(function (span) {
           return span.name.split(' ')[1]

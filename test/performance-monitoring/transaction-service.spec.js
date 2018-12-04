@@ -195,7 +195,7 @@ describe('TransactionService', function () {
 
           var xhrTask = { source: 'XMLHttpRequest.send', XHR: { url: testUrl, method: 'GET' } }
           var spanName = xhrTask.XHR.method + ' ' + testUrl
-          var span = transactionService.startSpan(spanName, 'ext.HttpRequest')
+          var span = transactionService.startSpan(spanName, 'external.http')
           span.end()
         })
       }
@@ -222,7 +222,7 @@ describe('TransactionService', function () {
 
     var zoneTr = new Transaction('ZoneTransaction', 'zone-transaction')
     transactionService.setCurrentTransaction(zoneTr)
-    var span = zoneTr.startSpan('GET http://example.com', 'ext.HttpRequest')
+    var span = zoneTr.startSpan('GET http://example.com', 'external.http')
     span.end()
     var tr = transactionService.sendPageLoadMetrics('resource-test')
   })
