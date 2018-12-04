@@ -86,7 +86,7 @@ function isDtHeaderValid (header) {
   )
 }
 
-var URL = require('url-parse')
+var URL = require('url-parse/dist/url-parse')
 
 function isSameOrigin (source, target) {
   var isSame = false
