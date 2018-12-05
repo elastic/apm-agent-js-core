@@ -2,8 +2,8 @@ function launchSauceConnect (userConfig, done) {
   var sauceConnectLauncher = require('sauce-connect-launcher')
 
   var config = {
-    username: userConfig && userConfig.username || process.env.SAUCE_USERNAME,
-    accessKey: userConfig && userConfig.accessKey || process.env.SAUCE_ACCESS_KEY,
+    username: userConfig && (userConfig.username || process.env.SAUCE_USERNAME),
+    accessKey: userConfig && (userConfig.accessKey || process.env.SAUCE_ACCESS_KEY),
     logger: console.log,
     noSslBumpDomains: 'all'
   }
@@ -28,4 +28,4 @@ function launchSauceConnect (userConfig, done) {
   tryConnect(3, 1, done)
 }
 module.exports = {
-launchSauceConnect}
+  launchSauceConnect}

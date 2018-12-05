@@ -64,7 +64,6 @@ function isLogEntryATestFailure (entry, whitelist) {
 }
 module.exports = {
   allowSomeBrowserErrors: function allowSomeBrowserErrors (whitelist, done) {
-    var then
     if (typeof done === 'function') {
       assertNoBrowserErrors(whitelist)
         .then(() => {

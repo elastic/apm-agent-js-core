@@ -19,7 +19,7 @@
     "karma-coverage": "karma start --coverage",
     "runUnitTests": "node ./dev-utils/run-script.js runUnitTests",
     "test": "npm run lint && npm run runUnitTests",
-    "lint": "standard src/**/*.js test/**/*.js",
+    "lint": "standard",
     "format": "prettier-standard src/**/*.js test/**/*.js"
   },
   "files": [
@@ -70,6 +70,6 @@
   },
   "standard": {
     "env": ["jasmine", "browser"],
-    "globals": ["suite", "benchmark"]
+    "globals": ["suite", "benchmark", "browser"]
   }
 }

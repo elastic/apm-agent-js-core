@@ -1,6 +1,7 @@
+var path = require('path')
+var fs = require('fs')
 var karmaUtils = require('./karma')
 var saucelabsUtils = require('./saucelabs')
-var path = require('path')
 
 function runKarma (configFile) {
   function karmaCallback (exitCode) {
@@ -17,7 +18,7 @@ function runKarma (configFile) {
 function runUnitTests (testConfig) {
   if (testConfig.sauceLabs) {
     saucelabsUtils.launchSauceConnect(testConfig.sauceLabs, runKarma.bind(this, testConfig.karmaConfigFile))
-  }else {
+  } else {
     runKarma(testConfig.karmaConfigFile)
   }
 }
@@ -40,20 +41,19 @@ function getTestEnvironmentVariables () {
 }
 
 var walkSync = function (dir, filter, filelist) {
-  var fs = fs || require('fs'),
-    files = fs.readdirSync(dir)
+  var files = fs.readdirSync(dir)
   filelist = filelist || []
   files.forEach(function (file) {
     var filename = path.join(dir, file)
     var stat = fs.statSync(filename)
     if (stat.isDirectory()) {
       filelist = walkSync(filename, filter, filelist)
-    }else {
+    } else {
       if (typeof filter.test === 'function') {
         if (filter.test(filename)) {
           filelist.push(filename)
         }
-      }else {
+      } else {
         filelist.push(filename)
       }
     }
@@ -87,7 +87,6 @@ function buildE2eBundles (basePath, callback) {
 
   console.log('Config Files: \n', fileList.join('\n'))
   webpack(configs, (err, stats) => {
-
     if (err) {
       console.log(err)
       cb(err)
@@ -111,8 +110,7 @@ function onExit (callback) {
   function exitHandler (err) {
     try {
       callback(err)
-    }
-    finally {
+    } finally {
       if (err) console.log(err)
     }
   }
@@ -146,18 +144,18 @@ function startSelenium (callback, manualStop) {
       console.log('Error while installing selenium:', installError)
     }
     selenium.start({drivers: drivers}, function (startError, child) {
+      function killSelenium () {
+        child.kill()
+        console.log('Just killed selenium!')
+      }
       if (startError) {
         console.log('Error while starting selenium:', startError)
         return process.exit(1)
       } else {
         console.log('Selenium started!')
-        function killSelenium () {
-          child.kill()
-          console.log('Just killed selenium!')
-        }
         if (manualStop) {
           callback(killSelenium)
-        }else {
+        } else {
           onExit(killSelenium)
           callback()
         }
@@ -167,7 +165,7 @@ function startSelenium (callback, manualStop) {
 }
 
 function runE2eTests (configFilePath, runSelenium) {
-  // npm i -D selenium-standalone webdriverio wdio-jasmine-framework 
+  // npm i -D selenium-standalone webdriverio wdio-jasmine-framework
   var Launcher = require('webdriverio').Launcher
   var wdio = new Launcher(configFilePath)
   function runWdio () {
@@ -179,13 +177,13 @@ function runE2eTests (configFilePath, runSelenium) {
       }, function (error) {
         console.error('Launcher failed to start the test', error)
         process.stdin.pause()
-        process.nextTick(() => process.exit(code))
+        process.nextTick(() => process.exit())
       // process.exit(1)
       })
   }
   if (runSelenium) {
     startSelenium(runWdio)
-  }else {
+  } else {
     runWdio()
   }
 }
