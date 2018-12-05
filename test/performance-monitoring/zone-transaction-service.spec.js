@@ -35,7 +35,10 @@ describe('ZoneTransactionService', function () {
     spyOn(tr, 'startSpan').and.callThrough()
     transactionService.setCurrentTransaction(tr)
     transactionService.startSpan('test-span', 'test-span')
-    expect(transactionService.getCurrentTransaction().startSpan).toHaveBeenCalledWith('test-span', 'test-span')
+    expect(transactionService.getCurrentTransaction().startSpan).toHaveBeenCalledWith(
+      'test-span',
+      'test-span'
+    )
   })
 
   it('should not start span when performance monitoring is disabled', function () {
@@ -83,7 +86,7 @@ describe('ZoneTransactionService', function () {
     config.set('active', true)
     transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
 
-    var span = transactionService.startSpan('testSpan', 'testtype')
+    transactionService.startSpan('testSpan', 'testtype')
     var trans = transactionService.getCurrentTransaction()
     expect(trans.name).toBe('ZoneTransaction')
     transactionService.startTransaction('transaction', 'transaction')
@@ -101,14 +104,31 @@ describe('ZoneTransactionService', function () {
     var tr = new Transaction('transaction', 'transaction')
     transactionService.setCurrentTransaction(tr)
     expect(tr._scheduledTasks).toEqual({})
-    zoneServiceMock.spec.onScheduleTask({source: 'setTimeout',taskId: 'setTimeout1'})
-    zoneServiceMock.spec.onScheduleTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'url'}})
-    expect(tr._scheduledTasks).toEqual({setTimeout1: 'setTimeout1','XMLHttpRequest.send1': 'XMLHttpRequest.send1'})
-    zoneServiceMock.spec.onBeforeInvokeTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',span: new Span('span', 'span')})
-    expect(tr._scheduledTasks).toEqual({setTimeout1: 'setTimeout1','XMLHttpRequest.send1': 'XMLHttpRequest.send1'})
-    zoneServiceMock.spec.onInvokeTask({source: 'setTimeout',taskId: 'setTimeout1'})
-    expect(tr._scheduledTasks).toEqual({'XMLHttpRequest.send1': 'XMLHttpRequest.send1'})
-    zoneServiceMock.spec.onCancelTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1'})
+    zoneServiceMock.spec.onScheduleTask({ source: 'setTimeout', taskId: 'setTimeout1' })
+    zoneServiceMock.spec.onScheduleTask({
+      source: 'XMLHttpRequest.send',
+      taskId: 'XMLHttpRequest.send1',
+      XHR: { method: 'GET', url: 'url' }
+    })
+    expect(tr._scheduledTasks).toEqual({
+      setTimeout1: 'setTimeout1',
+      'XMLHttpRequest.send1': 'XMLHttpRequest.send1'
+    })
+    zoneServiceMock.spec.onBeforeInvokeTask({
+      source: 'XMLHttpRequest.send',
+      taskId: 'XMLHttpRequest.send1',
+      span: new Span('span', 'span')
+    })
+    expect(tr._scheduledTasks).toEqual({
+      setTimeout1: 'setTimeout1',
+      'XMLHttpRequest.send1': 'XMLHttpRequest.send1'
+    })
+    zoneServiceMock.spec.onInvokeTask({ source: 'setTimeout', taskId: 'setTimeout1' })
+    expect(tr._scheduledTasks).toEqual({ 'XMLHttpRequest.send1': 'XMLHttpRequest.send1' })
+    zoneServiceMock.spec.onCancelTask({
+      source: 'XMLHttpRequest.send',
+      taskId: 'XMLHttpRequest.send1'
+    })
     expect(tr._scheduledTasks).toEqual({})
   })
 
@@ -118,8 +138,15 @@ describe('ZoneTransactionService', function () {
     transactionService.setCurrentTransaction(tr)
     spyOn(transactionService, 'startSpan').and.callThrough()
 
-    zoneServiceMock.spec.onScheduleTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'http://test.com/path?key=value'}})
-    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path', 'external.http')
+    zoneServiceMock.spec.onScheduleTask({
+      source: 'XMLHttpRequest.send',
+      taskId: 'XMLHttpRequest.send1',
+      XHR: { method: 'GET', url: 'http://test.com/path?key=value' }
+    })
+    expect(transactionService.startSpan).toHaveBeenCalledWith(
+      'GET http://test.com/path',
+      'external.http'
+    )
   })
 
   it('should check includeXHRQueryString config', function () {
@@ -129,8 +156,15 @@ describe('ZoneTransactionService', function () {
     transactionService.setCurrentTransaction(tr)
     spyOn(transactionService, 'startSpan').and.callThrough()
 
-    zoneServiceMock.spec.onScheduleTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'http://test.com/path?key=value'}})
-    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path?key=value', 'external.http')
+    zoneServiceMock.spec.onScheduleTask({
+      source: 'XMLHttpRequest.send',
+      taskId: 'XMLHttpRequest.send1',
+      XHR: { method: 'GET', url: 'http://test.com/path?key=value' }
+    })
+    expect(transactionService.startSpan).toHaveBeenCalledWith(
+      'GET http://test.com/path?key=value',
+      'external.http'
+    )
   })
 
   it('should call detectFinish onInvokeEnd', function () {
@@ -139,15 +173,19 @@ describe('ZoneTransactionService', function () {
 
     var trans = transactionService.startTransaction('transaction', 'transaction')
     spyOn(trans, 'detectFinish')
-    zoneServiceMock.spec.onInvokeStart({source: 'source',type: 'type'})
-    zoneServiceMock.spec.onInvokeEnd({source: 'source',type: 'type'})
+    zoneServiceMock.spec.onInvokeStart({ source: 'source', type: 'type' })
+    zoneServiceMock.spec.onInvokeEnd({ source: 'source', type: 'type' })
     expect(trans.detectFinish).toHaveBeenCalled()
   })
 
   it('should end the span if onInvokeTask is called first', function () {
     var tr = new Transaction('transaction', 'transaction')
     transactionService.setCurrentTransaction(tr)
-    var task = {source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'http://test.com/path?key=value'}}
+    var task = {
+      source: 'XMLHttpRequest.send',
+      taskId: 'XMLHttpRequest.send1',
+      XHR: { method: 'GET', url: 'http://test.com/path?key=value' }
+    }
     zoneServiceMock.spec.onScheduleTask(task)
     expect(task.span).toBeDefined()
     expect(task.span.ended).toBe(false)
@@ -234,7 +272,7 @@ describe('ZoneTransactionService', function () {
             fail()
           })
 
-          var xhrTask = {source: 'XMLHttpRequest.send', XHR: {url: testUrl,method: 'GET'}}
+          var xhrTask = { source: 'XMLHttpRequest.send', XHR: { url: testUrl, method: 'GET' } }
           zoneServiceMock.spec.onScheduleTask(xhrTask)
           zoneServiceMock.spec.onInvokeTask(xhrTask)
         })
@@ -273,7 +311,9 @@ describe('ZoneTransactionService', function () {
 
     expect(transactionService.shouldIgnoreTransaction('dont-ignore')).toBeFalsy()
     expect(transactionService.shouldIgnoreTransaction('transaction1')).toBeTruthy()
-    expect(transactionService.shouldIgnoreTransaction('something-transaction2-something')).toBeTruthy()
+    expect(
+      transactionService.shouldIgnoreTransaction('something-transaction2-something')
+    ).toBeTruthy()
 
     config.set('ignoreTransactions', [])
   })

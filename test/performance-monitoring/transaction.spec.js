@@ -2,7 +2,7 @@ var Transaction = require('../../src/performance-monitoring/transaction')
 var Span = require('../../src/performance-monitoring/span')
 
 describe('transaction.Transaction', function () {
-  beforeEach(function () { })
+  beforeEach(function () {})
 
   it('should contain correct number of spans in the end', function (done) {
     var firstSpan = new Span('first-span-name', 'first-span')
@@ -73,7 +73,9 @@ describe('transaction.Transaction', function () {
       // todo: transaction has already been added to the queue, shouldn't accept more spans
 
       var lastSpan = transaction.startSpan('last-span-name', 'last-span')
-      fail('done transaction should not accept more spans, now we simply ignore the newly stared span.')
+      fail(
+        'done transaction should not accept more spans, now we simply ignore the newly stared span.'
+      )
       lastSpan.end()
     })
   })
@@ -123,7 +125,7 @@ describe('transaction.Transaction', function () {
     var tr = new Transaction('/', 'transaction', { sendVerboseDebugInfo: true })
     expect(tr._scheduledTasks).toEqual({})
     tr.addTask('task1')
-    expect(tr._scheduledTasks).toEqual({ 'task1': 'task1' })
+    expect(tr._scheduledTasks).toEqual({ task1: 'task1' })
     tr.removeTask('task1')
     expect(tr._scheduledTasks).toEqual({})
   })
@@ -144,7 +146,6 @@ describe('transaction.Transaction', function () {
   })
 
   it('should not produce negative durations while adjusting to the spans', function () {
-
     var transaction = new Transaction('transaction', 'transaction')
     var span = transaction.startSpan('test', 'test')
     span.end()
@@ -156,7 +157,6 @@ describe('transaction.Transaction', function () {
     span._end = 11000000
     transaction.end()
     expect(span.duration()).toBe(0)
-
   })
 
   it('should truncate active spans', function () {

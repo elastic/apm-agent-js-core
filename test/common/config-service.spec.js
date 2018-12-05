@@ -36,8 +36,8 @@ describe('ConfigService', function () {
   it('should return undefined if the config does not exists', function () {
     expect(configService.get('context')).toEqual({})
     expect(configService.get('context.user')).toBe(undefined)
-    configService.set('context.user', {test: 'test'})
-    expect(configService.get('context.user')).toEqual({test: 'test'})
+    configService.set('context.user', { test: 'test' })
+    expect(configService.get('context.user')).toEqual({ test: 'test' })
     expect(configService.get('nonexisting.nonexisting')).toBe(undefined)
     expect(configService.get('context.nonexisting.nonexisting')).toBe(undefined)
   })
@@ -70,19 +70,24 @@ describe('ConfigService', function () {
   })
 
   it('should set userContext and customContext', function () {
-    configService.setCustomContext({test: 'test'})
+    configService.setCustomContext({ test: 'test' })
     var customContext = configService.get('context.custom')
-    expect(customContext).toEqual({test: 'test'})
+    expect(customContext).toEqual({ test: 'test' })
 
-    configService.setUserContext({test: 'test',id: 'userId', username: 'username',email: 'email'})
+    configService.setUserContext({
+      test: 'test',
+      id: 'userId',
+      username: 'username',
+      email: 'email'
+    })
     var userContext = configService.get('context.user')
-    expect(userContext).toEqual({id: 'userId',username: 'username',email: 'email'})
+    expect(userContext).toEqual({ id: 'userId', username: 'username', email: 'email' })
 
-    configService.setUserContext({test: 'test',id: 1, username: 1,email: 'email'})
+    configService.setUserContext({ test: 'test', id: 1, username: 1, email: 'email' })
     userContext = configService.get('context.user')
-    expect(userContext).toEqual({id: 1,email: 'email'})
+    expect(userContext).toEqual({ id: 1, email: 'email' })
 
-    configService.setUserContext({test: 'test', username: {}})
+    configService.setUserContext({ test: 'test', username: {} })
     userContext = configService.get('context.user')
     expect(userContext).toEqual({})
   })
@@ -91,15 +96,15 @@ describe('ConfigService', function () {
     var result = configService.isValid()
     expect(result).toBe(false)
 
-    configService.setConfig({serviceName: 'serviceName'})
+    configService.setConfig({ serviceName: 'serviceName' })
     result = configService.isValid()
     expect(result).toBe(true)
 
-    configService.setConfig({serverUrl: undefined})
+    configService.setConfig({ serverUrl: undefined })
     result = configService.isValid()
     expect(result).toBe(false)
 
-    configService.setConfig({serverUrl: 'test'})
+    configService.setConfig({ serverUrl: 'test' })
     result = configService.isValid()
     expect(result).toBe(true)
   })
@@ -110,17 +115,41 @@ describe('ConfigService', function () {
     configService.setTag('test.key', 'test value')
     configService.setTag('newKey', '')
     var tags = configService.get('context.tags')
-    expect(tags).toEqual({test: 'test','test_key': 'test value','newKey': ''})
+    expect(tags).toEqual({ test: 'test', test_key: 'test value', newKey: '' })
   })
 
   it('should setTags', function () {
     var date = new Date()
-    configService.setTags({test: 'test', no: 1, 'test.test': 'test', obj: {just: 'object'},date: date})
+    configService.setTags({
+      test: 'test',
+      no: 1,
+      'test.test': 'test',
+      obj: { just: 'object' },
+      date: date
+    })
     var tags = configService.get('context.tags')
-    expect(tags).toEqual({test: 'test', no: '1', 'test_test': 'test',obj: '[object Object]',date: String(date)})
+    expect(tags).toEqual({
+      test: 'test',
+      no: '1',
+      test_test: 'test',
+      obj: '[object Object]',
+      date: String(date)
+    })
 
-    configService.setTags({test: undefined, no: 1, 'test.test': 'test', obj: {just: 'object'},date: date})
+    configService.setTags({
+      test: undefined,
+      no: 1,
+      'test.test': 'test',
+      obj: { just: 'object' },
+      date: date
+    })
     tags = configService.get('context.tags')
-    expect(tags).toEqual({test: undefined, no: '1', 'test_test': 'test',obj: '[object Object]',date: String(date)})
+    expect(tags).toEqual({
+      test: undefined,
+      no: '1',
+      test_test: 'test',
+      obj: '[object Object]',
+      date: String(date)
+    })
   })
 })

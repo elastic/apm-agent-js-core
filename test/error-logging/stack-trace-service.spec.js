@@ -12,8 +12,8 @@ describe('StackTraceService', function () {
     setTimeout(function () {
       try {
         generateError()
-      } catch(error) {
-        var stackTraces = stackTraceService.createStackTraces({error})
+      } catch (error) {
+        var stackTraces = stackTraceService.createStackTraces({ error })
         expect(stackTraces.length).toBeGreaterThan(1)
         done()
       }

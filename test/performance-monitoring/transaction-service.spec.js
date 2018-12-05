@@ -1,6 +1,5 @@
 var TransactionService = require('../../src/performance-monitoring/transaction-service')
 var Transaction = require('../../src/performance-monitoring/transaction')
-var Span = require('../../src/performance-monitoring/span')
 
 var Config = require('../../src/common/config-service')
 var LoggingService = require('../../src/common/logging-service')
@@ -30,7 +29,10 @@ describe('TransactionService', function () {
     spyOn(tr, 'startSpan').and.callThrough()
     transactionService.setCurrentTransaction(tr)
     transactionService.startSpan('test-span', 'test-span')
-    expect(transactionService.getCurrentTransaction().startSpan).toHaveBeenCalledWith('test-span', 'test-span')
+    expect(transactionService.getCurrentTransaction().startSpan).toHaveBeenCalledWith(
+      'test-span',
+      'test-span'
+    )
   })
 
   it('should not start span when performance monitoring is disabled', function () {
@@ -83,7 +85,7 @@ describe('TransactionService', function () {
     config.set('active', true)
     transactionService = new TransactionService(logger, config)
 
-    var span = transactionService.startSpan('testSpan', 'testtype')
+    transactionService.startSpan('testSpan', 'testtype')
     var trans = transactionService.getCurrentTransaction()
     expect(trans.name).toBe('ZoneTransaction')
     transactionService.startTransaction('transaction', 'transaction')
@@ -233,7 +235,9 @@ describe('TransactionService', function () {
 
     expect(transactionService.shouldIgnoreTransaction('dont-ignore')).toBeFalsy()
     expect(transactionService.shouldIgnoreTransaction('transaction1')).toBeTruthy()
-    expect(transactionService.shouldIgnoreTransaction('something-transaction2-something')).toBeTruthy()
+    expect(
+      transactionService.shouldIgnoreTransaction('something-transaction2-something')
+    ).toBeTruthy()
 
     config.set('ignoreTransactions', [])
   })
@@ -283,7 +287,6 @@ describe('TransactionService', function () {
         expect(spans[0].name).toBe('Requesting and receiving the document')
       }
       done()
-    });
-
+    })
   })
 })

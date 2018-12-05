@@ -33,11 +33,14 @@ describe('PerformanceMonitoring', function () {
     var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
     var promise = apmServer.sendTransactions(payload)
     expect(promise).toBeDefined()
-    promise.then(function () {
-      done()
-    }, function (reason) {
-      fail('Failed sending transactions to the server, reason: ' + reason)
-    })
+    promise.then(
+      function () {
+        done()
+      },
+      function (reason) {
+        fail('Failed sending transactions to the server, reason: ' + reason)
+      }
+    )
   })
 
   it('should group small continuously similar spans up until the last one', function () {
@@ -156,9 +159,13 @@ describe('PerformanceMonitoring', function () {
   })
 
   it('should sendTransactionInterval', function () {
-    var transactionService = serviceFactory.getService('TransactionService')
     expect(configService.isValid()).toBe(true)
-    var tr = new Transaction('test transaction', 'transaction', { transactionSampleRate: 1 }, logger)
+    var tr = new Transaction(
+      'test transaction',
+      'transaction',
+      { transactionSampleRate: 1 },
+      logger
+    )
     var span = tr.startSpan('test span', 'test span thype')
     span.end()
     span._end += 10
@@ -189,29 +196,39 @@ describe('PerformanceMonitoring', function () {
     tr.browserResponsivenessCounter = 3
     var wasBrowserResponsive = performanceMonitoring.filterTransaction(tr)
     expect(wasBrowserResponsive).toBe(false)
-    expect(logger.debug)
-      .toHaveBeenCalledWith('Transaction was discarded! browser was not responsive enough during the transaction.',
-        ' duration:', 3000, ' browserResponsivenessCounter:', 3, 'interval:', 500)
+    expect(logger.debug).toHaveBeenCalledWith(
+      'Transaction was discarded! browser was not responsive enough during the transaction.',
+      ' duration:',
+      3000,
+      ' browserResponsivenessCounter:',
+      3,
+      'interval:',
+      500
+    )
   })
 
   xit('should initialize', function (done) {
-    var _fork = window.Zone.current.fork
     var zoneService = serviceFactory.getService('ZoneService')
     performanceMonitoring.init()
     spyOn(apmServer, 'addTransaction').and.callThrough()
 
     zoneService.runInApmZone(function () {
-      var tr = performanceMonitoring._transactionService.startTransaction('transaction', 'transaction')
+      var tr = performanceMonitoring._transactionService.startTransaction(
+        'transaction',
+        'transaction'
+      )
       var span = tr.startSpan('test span', 'test span type')
       span.end()
       span = tr.startSpan('test span 2', 'test span type')
       span.end()
       tr.detectFinish()
       setTimeout(() => {
-        expect(apmServer.addTransaction).toHaveBeenCalledWith(jasmine.objectContaining({
-          name: 'transaction',
-          type: 'transaction'
-        }))
+        expect(apmServer.addTransaction).toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            name: 'transaction',
+            type: 'transaction'
+          })
+        )
         done()
       }, 10)
     })
@@ -254,14 +271,17 @@ describe('PerformanceMonitoring', function () {
       var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
       var promise = apmServer.sendTransactions(payload)
       expect(promise).toBeDefined()
-      promise.then(function () {
-        window.performance.getEntriesByType = _getEntriesByType
-        done()
-      }, function (reason) {
-        fail('Failed sending transactions to the server, reason: ' + reason)
-      })
+      promise.then(
+        function () {
+          window.performance.getEntriesByType = _getEntriesByType
+          done()
+        },
+        function (reason) {
+          fail('Failed sending transactions to the server, reason: ' + reason)
+        }
+      )
     })
-    var tr = transactionService.sendPageLoadMetrics('resource-test')
+    transactionService.sendPageLoadMetrics('resource-test')
   })
 
   it('should filter out empty transactions', function () {
@@ -278,7 +298,6 @@ describe('PerformanceMonitoring', function () {
     result = performanceMonitoring.filterTransaction(tr)
     expect(result).toBe(false)
 
-
     tr.end()
     if (tr._rootSpan._end && tr._rootSpan._end === tr._rootSpan._start) {
       tr._rootSpan._end += 100
@@ -286,7 +305,6 @@ describe('PerformanceMonitoring', function () {
     expect(tr.duration()).toBeGreaterThan(0)
     result = performanceMonitoring.filterTransaction(tr)
     expect(result).toBe(true)
-
   })
 
   it('should filter the transactions with duration above threshold', function () {
@@ -330,7 +348,6 @@ describe('PerformanceMonitoring', function () {
     var headerName = configService.get('distributedTracingHeaderName')
     var headerValue = utils.getDtHeaderValue(task.data.span)
     expect(req.setRequestHeader).toHaveBeenCalledWith(headerName, headerValue)
-
   })
 
   it('should consider fetchInProgress to avoid duplicate spans', function (done) {
@@ -362,7 +379,6 @@ describe('PerformanceMonitoring', function () {
     req.send()
     expect(task.data.span).toBeDefined()
     expect(task.data.span.ended).toBeFalsy()
-
   })
 
   if (window.fetch) {
@@ -372,30 +388,31 @@ describe('PerformanceMonitoring', function () {
       performanceMonitoring.cancelPatchSub = patchSub.subscribe(function (event, task) {
         fn(event, task)
         if (event === patchUtils.SCHEDULE) {
-          dTHeaderValue = task.data.target.headers.get(configService.get('distributedTracingHeaderName'))
+          dTHeaderValue = task.data.target.headers.get(
+            configService.get('distributedTracingHeaderName')
+          )
         }
       })
       var transactionService = performanceMonitoring._transactionService
       var tr = transactionService.startTransaction('fetch transaction', 'custom')
       spyOn(transactionService, 'startSpan').and.callThrough()
 
-      window.fetch('/')
-        .then(function () {
-          setTimeout(() => {
-            expect(tr.spans.length).toBe(1)
-            expect(tr.spans[0].name).toBe('GET /')
-            expect(tr.spans[0].context).toEqual({
-              http: {
-                method: 'GET',
-                url: '/',
-                status_code: 200
-              }
-            })
-            expect(dTHeaderValue).toBeDefined()
-            performanceMonitoring.cancelPatchSub()
-            done()
-          });
+      window.fetch('/').then(function () {
+        setTimeout(() => {
+          expect(tr.spans.length).toBe(1)
+          expect(tr.spans[0].name).toBe('GET /')
+          expect(tr.spans[0].context).toEqual({
+            http: {
+              method: 'GET',
+              url: '/',
+              status_code: 200
+            }
+          })
+          expect(dTHeaderValue).toBeDefined()
+          performanceMonitoring.cancelPatchSub()
+          done()
         })
+      })
       expect(transactionService.startSpan).toHaveBeenCalledWith('GET /', 'external.http')
     })
 
@@ -413,12 +430,12 @@ describe('PerformanceMonitoring', function () {
           var req = new window.XMLHttpRequest()
           req.open('GET', url, true)
           req.addEventListener('readystatechange', function () {
-            // to guarantee the order of event execution 
+            // to guarantee the order of event execution
             setTimeout(() => {
               if (req.readyState === req.DONE) {
                 resolve(req.responseText)
               }
-            });
+            })
           })
 
           // Can't rely on the fetch-patch to set this flag because of the way karma executes tests
@@ -430,7 +447,6 @@ describe('PerformanceMonitoring', function () {
       var transactionService = performanceMonitoring._transactionService
       var tr = transactionService.startTransaction('fetch transaction', 'custom')
 
-
       var promise = window.fetch('/')
       expect(promise).toBeDefined()
       promise.then(function (response) {
@@ -439,24 +455,24 @@ describe('PerformanceMonitoring', function () {
           expect(tr.spans.length).toBe(1)
           expect(events).toEqual([
             {
-              "event": "schedule",
-              "source": "fetch"
+              event: 'schedule',
+              source: 'fetch'
             },
             {
-              "event": "schedule",
-              "source": "XMLHttpRequest.send"
+              event: 'schedule',
+              source: 'XMLHttpRequest.send'
             },
             {
-              "event": "invoke",
-              "source": "XMLHttpRequest.send"
+              event: 'invoke',
+              source: 'XMLHttpRequest.send'
             },
             {
-              "event": "invoke",
-              "source": "fetch"
+              event: 'invoke',
+              source: 'fetch'
             }
           ])
           done()
-        });
+        })
       })
 
       window['__fetchDelegate'] = undefined

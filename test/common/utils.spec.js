@@ -42,12 +42,22 @@ describe('lib/utils', function () {
 
   describe('parseUrl', function () {
     it('should parse relative url', function () {
-      var result = utils.parseUrl('/path?param=value&param2=value2&0=zero&foo&empty=&key=double=double&undefined')
+      var result = utils.parseUrl(
+        '/path?param=value&param2=value2&0=zero&foo&empty=&key=double=double&undefined'
+      )
       var expected = {
         protocol: '',
         path: '/path',
         queryString: 'param=value&param2=value2&0=zero&foo&empty=&key=double=double&undefined',
-        queryStringParsed: { param: 'value', param2: 'value2', 0: 'zero', foo: '', empty: '', key: 'double=double', undefined: '' },
+        queryStringParsed: {
+          param: 'value',
+          param2: 'value2',
+          0: 'zero',
+          foo: '',
+          empty: '',
+          key: 'double=double',
+          undefined: ''
+        },
         hash: ''
       }
       expect(result).toEqual(expected)
@@ -55,32 +65,66 @@ describe('lib/utils', function () {
 
     it('should parse absolute url', function () {
       var result = utils.parseUrl('http://test.com/path.js?param=value')
-      expect(result).toEqual({ protocol: 'http:', path: 'http://test.com/path.js', queryString: 'param=value', queryStringParsed: { param: 'value' }, hash: '' })
+      expect(result).toEqual({
+        protocol: 'http:',
+        path: 'http://test.com/path.js',
+        queryString: 'param=value',
+        queryStringParsed: { param: 'value' },
+        hash: ''
+      })
     })
 
     it('should parse url with fragment part', function () {
       var result = utils.parseUrl('http://test.com/path?param=value#fragment')
-      expect(result).toEqual(jasmine.objectContaining({ path: 'http://test.com/path', queryString: 'param=value', queryStringParsed: { param: 'value' }, hash: '#fragment' }))
+      expect(result).toEqual(
+        jasmine.objectContaining({
+          path: 'http://test.com/path',
+          queryString: 'param=value',
+          queryStringParsed: { param: 'value' },
+          hash: '#fragment'
+        })
+      )
     })
 
     it('should parse url with fragment before query string', function () {
       var result = utils.parseUrl('http://test.com/path#fragment?param=value')
-      expect(result).toEqual(jasmine.objectContaining({ path: 'http://test.com/path', queryString: '', queryStringParsed: {}, hash: '#fragment?param=value' }))
+      expect(result).toEqual(
+        jasmine.objectContaining({
+          path: 'http://test.com/path',
+          queryString: '',
+          queryStringParsed: {},
+          hash: '#fragment?param=value'
+        })
+      )
     })
 
     it('should parse url with leading &', function () {
       var result = utils.parseUrl('/path/?&param=value')
-      expect(result).toEqual({ protocol: '', path: '/path/', queryString: '&param=value', queryStringParsed: { 'param': 'value' }, hash: '' })
+      expect(result).toEqual({
+        protocol: '',
+        path: '/path/',
+        queryString: '&param=value',
+        queryStringParsed: { param: 'value' },
+        hash: ''
+      })
     })
 
     it('should parse url with not querystring', function () {
       var result = utils.parseUrl('/path')
-      expect(result).toEqual(jasmine.objectContaining({ path: '/path', queryString: '', queryStringParsed: {} }))
+      expect(result).toEqual(
+        jasmine.objectContaining({ path: '/path', queryString: '', queryStringParsed: {} })
+      )
     })
 
     it('should parse url with only the querystring', function () {
       var result = utils.parseUrl('?param=value')
-      expect(result).toEqual(jasmine.objectContaining({ path: '', queryString: 'param=value', queryStringParsed: { param: 'value' } }))
+      expect(result).toEqual(
+        jasmine.objectContaining({
+          path: '',
+          queryString: 'param=value',
+          queryStringParsed: { param: 'value' }
+        })
+      )
     })
   })
 
@@ -94,21 +138,26 @@ describe('lib/utils', function () {
       expect(utils.sanitizeString('justlong', 5, true, 'no string')).toBe('justl')
       expect(utils.sanitizeString('justlong', undefined, true, 'no string')).toBe('justlong')
       expect(utils.sanitizeString('just', 5, true, 'no string')).toBe('just')
-      expect(utils.sanitizeString({ what: 'This is an object' }, 5, true, 'no string')).toBe('[obje')
+      expect(utils.sanitizeString({ what: 'This is an object' }, 5, true, 'no string')).toBe(
+        '[obje'
+      )
       expect(utils.sanitizeString(0, 5, true, 'no string')).toBe('0')
       expect(utils.sanitizeString(1, 5, true, 'no string')).toBe('1')
     })
 
     it('should sanitize objects', function () {
-      var result = utils.sanitizeObjectStrings({
-        string: 'string',
-        null: null,
-        undefined: undefined,
-        number: 1,
-        object: {
-          string: 'string'
-        }
-      }, 3)
+      var result = utils.sanitizeObjectStrings(
+        {
+          string: 'string',
+          null: null,
+          undefined: undefined,
+          number: 1,
+          object: {
+            string: 'string'
+          }
+        },
+        3
+      )
 
       expect(result).toEqual({
         string: 'str',
@@ -140,7 +189,6 @@ describe('lib/utils', function () {
     result = utils.generateRandomId(16)
     expect(result.length).toBe(16)
 
-
     var array = [252, 192, 107, 62, 0, 43, 190, 201, 129, 49, 251, 159, 243, 81, 153, 192]
     result = utils.bytesToHex(array)
     expect(result).toBe('fcc06b3e002bbec98131fb9ff35199c0')
@@ -151,9 +199,18 @@ describe('lib/utils', function () {
     expect(result).toBe(true)
     result = utils.isSameOrigin('http:test.com/test/new', window.location.href)
     expect(result).toBe(false)
-    result = utils.isSameOrigin('http://test.com/test/new', [window.location.href, 'http://test.com'])
+    result = utils.isSameOrigin('http://test.com/test/new', [
+      window.location.href,
+      'http://test.com'
+    ])
     expect(result).toBe(true)
-    result = utils.isSameOrigin('http://test.com/test/new', [window.location.href, 'http://test1.com', 'not-url:3000', {}, undefined])
+    result = utils.isSameOrigin('http://test.com/test/new', [
+      window.location.href,
+      'http://test1.com',
+      'not-url:3000',
+      {},
+      undefined
+    ])
     expect(result).toBe(false)
     result = utils.isSameOrigin('http://test.com/test/new', undefined)
     expect(result).toBe(false)
@@ -182,23 +239,25 @@ describe('lib/utils', function () {
   it('should validate DT header', function () {
     var result = utils.isDtHeaderValid('00-a1bc6db567095621cdc01dd11359217b-0b5a9e8b3c8fd252-01')
     expect(result).toBe(true)
-    
+
     result = utils.isDtHeaderValid('00-a1bc6db567095621cdc01dd11359217b-null-01')
     expect(result).toBe(false)
-    
+
     result = utils.isDtHeaderValid('00-null-0b5a9e8b3c8fd252-01')
     expect(result).toBe(false)
-    
+
     result = utils.isDtHeaderValid('00-00000000000000000000000000000000-0b5a9e8b3c8fd252-00')
     expect(result).toBe(false)
-    
+
     result = utils.isDtHeaderValid('00-a1bc6db567095621cdc01dd11359217b-0000000000000000-00')
     expect(result).toBe(false)
-    
+
     result = utils.isDtHeaderValid('00-12345678901234567890123456789012-.234567890123456-01')
     expect(result).toBe(false)
 
-    result = utils.isDtHeaderValid('00-12345678901234567890123456789012-1234567890123456-01-what-the-future-will-be-like')
+    result = utils.isDtHeaderValid(
+      '00-12345678901234567890123456789012-1234567890123456-01-what-the-future-will-be-like'
+    )
     expect(result).toBe(false)
   })
 })

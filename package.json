@@ -13,17 +13,17 @@
     "prepare-minor": "sh ./dev-utils/prepare-release minor && npm run push-release",
     "prepare-major": "sh ./dev-utils/prepare-release major && npm run push-release",
     "push-release": "git push origin master --follow-tags && npm publish",
-    "changelog": "node node_modules/conventional-changelog-cli/cli.js  -p angular -i CHANGELOG.md -s",
-    "karma": "node node_modules/karma/bin/karma start",
-    "karma-bench": "node node_modules/karma/bin/karma start karma.bench.conf.js",
-    "karma-coverage": "node node_modules/karma/bin/karma start --coverage",
+    "changelog": "conventional-changelog-cli  -p angular -i CHANGELOG.md -s",
+    "karma": "karma start",
+    "karma-bench": "karma start karma.bench.conf.js",
+    "karma-coverage": "karma start --coverage",
     "runUnitTests": "node ./dev-utils/run-script.js runUnitTests",
-    "test": "node node_modules/standard/bin/cmd.js src/**/* && npm run runUnitTests",
-    "format": "prettier-standard 'src/**/*.js'"
+    "test": "npm run lint && npm run runUnitTests",
+    "lint": "standard src/**/*.js test/**/*.js",
+    "format": "prettier-standard src/**/*.js test/**/*.js"
   },
   "files": [
     "src/**/*.js",
-    "test/**/*.js",
     "dev-utils/**/*"
   ],
   "dependencies": {
@@ -69,18 +69,7 @@
     "webpack": "^3.6.0"
   },
   "standard": {
-    "globals": [
-      "jasmine",
-      "describe",
-      "beforeEach",
-      "afterEach",
-      "it",
-      "xit",
-      "expect",
-      "fail",
-      "spyOn",
-      "browser",
-      "xdescribe"
-    ]
+    "env": ["jasmine", "browser"],
+    "globals": ["suite", "benchmark"]
   }
 }

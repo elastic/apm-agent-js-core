@@ -1,5 +1,4 @@
 var ZoneService = require('../../src/performance-monitoring/zone-service')
-var ServiceFactory = require('../../src/common/service-factory')
 var patchCommon = require('../../src/common/patching/patch-common')
 
 var LoggingService = require('../../src/common/logging-service')
@@ -19,13 +18,13 @@ xdescribe('ZoneService', function () {
   //  can't create a new ZoneService for each test since the old one is also using the global zone
   zoneService = new ZoneService(logger)
   zoneService.initialize(window.Zone.current)
-
+  var noop = function () {}
   function resetZoneCallbacks (zoneService) {
-    zoneService.spec.onScheduleTask = function (task) {}
-    zoneService.spec.onBeforeInvokeTask = function () {}
-    zoneService.spec.onInvokeTask = function (task) {}
-    zoneService.spec.onCancelTask = function (task) {}
-    zoneService.spec.onHandleError = function (task) {}
+    zoneService.spec.onScheduleTask = noop
+    zoneService.spec.onBeforeInvokeTask = noop
+    zoneService.spec.onInvokeTask = noop
+    zoneService.spec.onCancelTask = noop
+    zoneService.spec.onHandleError = noop
   }
 
   it('should call registered event listeners for XHR', function (done) {
@@ -77,7 +76,7 @@ xdescribe('ZoneService', function () {
   it('should keep track of task for XHR if the event listeners are registered after send', function (done) {
     var response
     var readyStateChangeSpy = jasmine.createSpy('readyStateChangeSpy')
-    
+
     zoneService.spec.onScheduleTask = function (task) {
       expect(response).toBeUndefined()
     }
@@ -318,14 +317,14 @@ xdescribe('ZoneService', function () {
   })
 
   it('should getCurrentZone', function () {
-    window.Zone.current.fork({name: 'testZone'}).run(function () {
+    window.Zone.current.fork({ name: 'testZone' }).run(function () {
       var zone = zoneService.getCurrentZone()
       expect(zone.name).toBe('testZone')
     })
   })
 
   it('should get and set values on the zone', function () {
-    window.Zone.current.fork({name: 'testZone'}).run(function () {
+    window.Zone.current.fork({ name: 'testZone' }).run(function () {
       zoneService.set('testKey', 'testValue')
       expect(zoneService.get('testKey')).toBe('testValue')
       expect(window.Zone.current.get('testKey')).toBe('testValue')

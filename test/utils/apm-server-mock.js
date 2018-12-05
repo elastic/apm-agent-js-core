@@ -1,11 +1,11 @@
 var Subscription = require('../../src/common/subscription')
 class ApmServerMock {
-  constructor(apmServer, useMocks) {
-    var subscription = this.subscription = new Subscription()
-    var _apmServer = this._apmServer = apmServer
-    var calls = this.calls = {}
+  constructor (apmServer, useMocks) {
+    var subscription = (this.subscription = new Subscription())
+    var _apmServer = (this._apmServer = apmServer)
+    var calls = (this.calls = {})
 
-    function captureCall(methodName, call) {
+    function captureCall (methodName, call) {
       if (calls[methodName]) {
         calls[methodName].push(call)
       } else {
@@ -13,7 +13,8 @@ class ApmServerMock {
       }
       subscription.applyAll(this, [call])
     }
-    function applyMock(methodName, captureFn, mockFn) {
+    // eslint-disable-next-line
+    function applyMock (methodName, captureFn, mockFn) {
       var args = Array.prototype.slice.call(arguments)
       args.splice(0, 3)
       var result
@@ -29,10 +30,10 @@ class ApmServerMock {
       return result
     }
 
-    function spyOn(service, methodName, mockFn) {
+    function spyOn (service, methodName, mockFn) {
       var _orig = service[methodName]
-      return service[methodName] = function () {
-        var args = Array.prototype.slice.call(arguments).map((a) => JSON.parse(JSON.stringify(a)))
+      return (service[methodName] = function () {
+        var args = Array.prototype.slice.call(arguments).map(a => JSON.parse(JSON.stringify(a)))
         var call = { args: args, mocked: false }
         if (mockFn) {
           call.mocked = true
@@ -44,16 +45,32 @@ class ApmServerMock {
           captureCall(methodName, call)
           return call.returnValue
         }
-      }
+      })
     }
-    spyOn(_apmServer, 'sendErrors', useMocks ? function () { return Promise.resolve(); } : undefined)
+    spyOn(
+      _apmServer,
+      'sendErrors',
+      useMocks
+        ? function () {
+          return Promise.resolve()
+        }
+        : undefined
+    )
 
-    spyOn(_apmServer, 'sendTransactions', useMocks ? function () { return Promise.resolve(); } : undefined)
+    spyOn(
+      _apmServer,
+      'sendTransactions',
+      useMocks
+        ? function () {
+          return Promise.resolve()
+        }
+        : undefined
+    )
 
     this.addError = _apmServer.addError.bind(_apmServer)
     this.addTransaction = _apmServer.addTransaction.bind(_apmServer)
   }
-  init() { }
+  init () {}
 }
 
 module.exports = ApmServerMock

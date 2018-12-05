@@ -4,16 +4,20 @@ describe('throttle', function () {
   it('should throttle', function (done) {
     var counter = 0
     var throttled = 0
-    var fn = throttle(function () {
-      counter++
-      return 'fn_result'
-    }, function () {
-      throttled++
-      return 'throttle_result'
-    }, {
-      limit: 2,
-      interval: 100
-    })
+    var fn = throttle(
+      function () {
+        counter++
+        return 'fn_result'
+      },
+      function () {
+        throttled++
+        return 'throttle_result'
+      },
+      {
+        limit: 2,
+        interval: 100
+      }
+    )
 
     var result = fn()
     expect(result).toBe('fn_result')
@@ -49,14 +53,18 @@ describe('throttle', function () {
   it('should throttle 1 request per execution cycle', function (done) {
     var counter = 0
     var throttled = 0
-    var fn = throttle(function () {
-      counter++
-      return 'fn_result'
-    }, function () {
-      throttled++
-    }, {
-      limit: 1
-    })
+    var fn = throttle(
+      function () {
+        counter++
+        return 'fn_result'
+      },
+      function () {
+        throttled++
+      },
+      {
+        limit: 1
+      }
+    )
     var result = fn()
     expect(result).toBe('fn_result')
     expect(counter).toBe(1)
@@ -82,17 +90,21 @@ describe('throttle', function () {
   it('should accept countFn', function () {
     var counter = 0
     var throttled = 0
-    var fn = throttle(function () {
-      counter++
-      return 'fn_result'
-    }, function () {
-      throttled++
-    }, {
-      limit: 3,
-      countFn: function (i) {
-        return i
+    var fn = throttle(
+      function () {
+        counter++
+        return 'fn_result'
+      },
+      function () {
+        throttled++
+      },
+      {
+        limit: 3,
+        countFn: function (i) {
+          return i
+        }
       }
-    })
+    )
 
     var result = fn(2)
     expect(result).toBe('fn_result')

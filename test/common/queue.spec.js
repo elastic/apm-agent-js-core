@@ -8,7 +8,7 @@ describe('Queue', function () {
       expect(qitems).toEqual(items)
       flushCounter++
     })
-    for (var i = 0;i < 100;i++) {
+    for (var i = 0; i < 100; i++) {
       items.push(i)
       queue.add(i)
     }
@@ -21,18 +21,21 @@ describe('Queue', function () {
   it('should flush when reaching queueLimit', function (done) {
     var flushCounter = 0
     var items = []
-    var queue = new Queue(function (qitems) {
-      flushCounter++
-      if (flushCounter > 5) {
-        expect(qitems.length).toBe(5)
-      }else {
-        expect(qitems.length).toBe(20)
+    var queue = new Queue(
+      function (qitems) {
+        flushCounter++
+        if (flushCounter > 5) {
+          expect(qitems.length).toBe(5)
+        } else {
+          expect(qitems.length).toBe(20)
+        }
+      },
+      {
+        queueLimit: 20
       }
-    }, {
-      queueLimit: 20
-    })
+    )
 
-    for (var i = 0;i < 105;i++) {
+    for (var i = 0; i < 105; i++) {
       items.push(i)
       queue.add(i)
     }
@@ -45,14 +48,17 @@ describe('Queue', function () {
   it('should flush according to the interval', function (done) {
     var flushCounter = 0
     var items = []
-    var queue = new Queue(function (qitems) {
-      expect(qitems).toEqual(items)
-      flushCounter++
-    }, {
-      flushInterval: 100
-    })
+    var queue = new Queue(
+      function (qitems) {
+        expect(qitems).toEqual(items)
+        flushCounter++
+      },
+      {
+        flushInterval: 100
+      }
+    )
 
-    for (var i = 0;i < 105;i++) {
+    for (var i = 0; i < 105; i++) {
       items.push(i)
       queue.add(i)
     }

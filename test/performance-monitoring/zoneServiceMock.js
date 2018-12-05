@@ -1,5 +1,5 @@
 function ZoneServiceMock () {
-  function noop () { }
+  function noop () {}
 
   this.spec = {
     onScheduleTask: noop,
@@ -7,7 +7,7 @@ function ZoneServiceMock () {
     onCancelTask: noop
   }
 
-  this.zone = {name: 'apmMockZone'}
+  this.zone = { name: 'apmMockZone' }
   this.get = function (key) {
     return this.zone[key]
   }

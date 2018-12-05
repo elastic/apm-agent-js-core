@@ -3,7 +3,7 @@ var Transaction = require('../../src/performance-monitoring/transaction')
 // var performanceMonitoring = require('../../src/performance-monitoring/performance-monitoring')
 var createServiceFactory = require('..').createServiceFactory
 
-function generateTransaction(count) {
+function generateTransaction (count) {
   var result = []
   for (var i = 0; i < count; i++) {
     var tr = new Transaction('transaction #' + i, 'transaction', {})
@@ -26,7 +26,7 @@ function generateTransaction(count) {
   return result
 }
 
-function generateErrors(count) {
+function generateErrors (count) {
   var result = []
   for (var i = 0; i < count; i++) {
     result.push(new Error('error #' + i))
@@ -70,12 +70,15 @@ describe('ApmServer', function () {
     })
     var result = apmServer.sendTransactions([{ test: 'test' }])
     expect(result).toBeDefined()
-    result.then(function () {
-      fail('Request should have failed!')
-    }, function (reason) {
-      expect(reason).toBeDefined()
-      done()
-    })
+    result.then(
+      function () {
+        fail('Request should have failed!')
+      },
+      function (reason) {
+        expect(reason).toBeDefined()
+        done()
+      }
+    )
   })
 
   it('should check config validity before making request to the server', function () {
@@ -91,7 +94,7 @@ describe('ApmServer', function () {
     expect(loggingService.debug).not.toHaveBeenCalled()
 
     loggingService.warn.calls.reset()
-    var result = apmServer.sendErrors([{ test: 'test' }])
+    result = apmServer.sendErrors([{ test: 'test' }])
     expect(result).toBeUndefined()
     expect(apmServer._postJson).not.toHaveBeenCalled()
     expect(loggingService.warn).not.toHaveBeenCalled()
@@ -132,7 +135,9 @@ describe('ApmServer', function () {
     trs = generateTransaction(20)
     trs.forEach(apmServer.addTransaction.bind(apmServer))
     expect(apmServer._throttledMakeRequest).toHaveBeenCalled()
-    expect(loggingService.warn).toHaveBeenCalledWith('ElasticAPM: Dropped request to http://localhost:8200/v1/client-side/transactions due to throttling!')
+    expect(loggingService.warn).toHaveBeenCalledWith(
+      'ElasticAPM: Dropped request to http://localhost:8200/v1/client-side/transactions due to throttling!'
+    )
     expect(apmServer._makeHttpRequest).not.toHaveBeenCalled()
   })
 
@@ -181,15 +186,20 @@ describe('ApmServer', function () {
     var _sendErrors = apmServer.sendErrors
     apmServer.sendErrors = function () {
       var result = _sendErrors.apply(apmServer, arguments)
-      result.then(function () {
-        fail('Request should have failed!')
-      }, function () {
-        setTimeout(() => {
-          expect(loggingService.warn)
-            .toHaveBeenCalledWith('Failed sending errors!', jasmine.objectContaining({}))
-          done()
-        })
-      })
+      result.then(
+        function () {
+          fail('Request should have failed!')
+        },
+        function () {
+          setTimeout(() => {
+            expect(loggingService.warn).toHaveBeenCalledWith(
+              'Failed sending errors!',
+              jasmine.objectContaining({})
+            )
+            done()
+          })
+        }
+      )
       return result
     }
     configService.setConfig({
@@ -209,15 +219,20 @@ describe('ApmServer', function () {
     var _sendTransactions = apmServer.sendTransactions
     apmServer.sendTransactions = function () {
       var result = _sendTransactions.apply(apmServer, arguments)
-      result.then(function () {
-        fail('Request should have failed!')
-      }, function () {
-        setTimeout(() => {
-          expect(loggingService.warn)
-            .toHaveBeenCalledWith('Failed sending transactions!', jasmine.objectContaining({}))
-          done()
-        })
-      })
+      result.then(
+        function () {
+          fail('Request should have failed!')
+        },
+        function () {
+          setTimeout(() => {
+            expect(loggingService.warn).toHaveBeenCalledWith(
+              'Failed sending transactions!',
+              jasmine.objectContaining({})
+            )
+            done()
+          })
+        }
+      )
       return result
     }
     configService.setConfig({
@@ -250,7 +265,9 @@ describe('ApmServer', function () {
 
     setTimeout(() => {
       expect(apmServer.errorQueue.items.length).toBe(0)
-      expect(apmServer.sendErrors).toHaveBeenCalledWith(jasmine.objectContaining(errors.slice(0, 4)))
+      expect(apmServer.sendErrors).toHaveBeenCalledWith(
+        jasmine.objectContaining(errors.slice(0, 4))
+      )
       errors.forEach(apmServer.addError.bind(apmServer))
       expect(apmServer.errorQueue.items.length).toBe(5)
       apmServer.errorQueue._clear()
@@ -277,7 +294,9 @@ describe('ApmServer', function () {
 
     setTimeout(() => {
       expect(apmServer.transactionQueue.items.length).toBe(0)
-      expect(apmServer.sendTransactions).toHaveBeenCalledWith(jasmine.objectContaining(transactions.slice(0, 4)))
+      expect(apmServer.sendTransactions).toHaveBeenCalledWith(
+        jasmine.objectContaining(transactions.slice(0, 4))
+      )
       transactions.forEach(apmServer.addTransaction.bind(apmServer))
       expect(apmServer.transactionQueue.items.length).toBe(5)
       apmServer.transactionQueue._clear()
@@ -305,9 +324,7 @@ describe('ApmServer', function () {
     configService.setConfig({
       serviceName: 'serviceName'
     })
-    configService.addFilter(function (payload) {
-      return
-    })
+    configService.addFilter(function (payload) {})
     spyOn(apmServer, '_postJson')
     var result = apmServer.sendErrors([{ test: 'test' }])
     expect(result).toBeUndefined()
@@ -322,7 +339,9 @@ describe('ApmServer', function () {
     trs = performanceMonitoring.convertTransactionsToServerModel(trs)
     var result = apmServer.ndjsonTransactions(trs)
     var expected = [
-      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","subType":"NA","action":"NA","start":10,"duration":10}}\n','{"transaction":{"id":"transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-1-1","transaction_id":"transaction-id-1","parent_id":"transaction-id-1","trace_id":"trace-id-1","name":"name","type":"type","subType":"NA","action":"NA","start":10,"duration":10}}\n','{"transaction":{"id":"transaction-id-2","trace_id":"trace-id-2","name":"transaction #2","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-2-1","transaction_id":"transaction-id-2","parent_id":"transaction-id-2","trace_id":"trace-id-2","name":"name","type":"type","subType":"NA","action":"NA","start":10,"duration":10}}\n'
+      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","parent_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","subType":"NA","action":"NA","start":10,"duration":10}}\n',
+      '{"transaction":{"id":"transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-1-1","transaction_id":"transaction-id-1","parent_id":"transaction-id-1","trace_id":"trace-id-1","name":"name","type":"type","subType":"NA","action":"NA","start":10,"duration":10}}\n',
+      '{"transaction":{"id":"transaction-id-2","trace_id":"trace-id-2","name":"transaction #2","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"sampled":false}}\n{"span":{"id":"span-id-2-1","transaction_id":"transaction-id-2","parent_id":"transaction-id-2","trace_id":"trace-id-2","name":"name","type":"type","subType":"NA","action":"NA","start":10,"duration":10}}\n'
     ]
 
     // var snapshot = result.map(function (r) {
