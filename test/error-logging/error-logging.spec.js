@@ -152,7 +152,7 @@ describe('ErrorLogging', function () {
     resultPromises.push(errorLogging.logErrorEvent(undefined), true)
 
     Promise.all(resultPromises).then(
-      function (result) {
+      function () {
         done()
       },
       reason => {

@@ -12,22 +12,19 @@ class ServiceFactory {
   }
 
   registerCoreServices () {
-    var serviceFactory = this
+    var configService = new ConfigService()
+    var loggingService = new LoggingService()
 
     this.registerServiceCreator('ConfigService', function () {
-      var configService = new ConfigService()
       return configService
     })
-
     this.registerServiceCreator('LoggingService', function () {
-      return new LoggingService()
+      return loggingService
     })
     this.registerServiceCreator('ApmServer', function () {
-      return new ApmServer(
-        serviceFactory.getService('ConfigService'),
-        serviceFactory.getService('LoggingService')
-      )
+      return new ApmServer(configService, loggingService)
     })
+
     this.registerServiceInstance('PatchUtils', patchUtils)
     this.registerServiceInstance('Utils', utils)
   }
@@ -51,7 +48,7 @@ class ServiceFactory {
     }
 
     setLogLevel(loggingService, configService)
-    configService.subscribeToChange(function (newConfig) {
+    configService.subscribeToChange(function () {
       setLogLevel(loggingService, configService)
     })
 

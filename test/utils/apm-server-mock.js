@@ -14,7 +14,7 @@ class ApmServerMock {
       subscription.applyAll(this, [call])
     }
     // eslint-disable-next-line
-    function applyMock (methodName, captureFn, mockFn) {
+    function applyMock(methodName, captureFn, mockFn) {
       var args = Array.prototype.slice.call(arguments)
       args.splice(0, 3)
       var result

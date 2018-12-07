@@ -23,7 +23,7 @@ testTransactionAfterEvents.forEach(function (ev) {
   testTransactionAfterEventsObj[ev] = 1
 })
 
-function ZoneService (logger, config) {
+function ZoneService (logger) {
   this.events = new Subscription()
 
   var nextId = 0

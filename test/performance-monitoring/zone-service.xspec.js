@@ -35,10 +35,10 @@ xdescribe('ZoneService', function () {
       expect(task.XHR.url).toBe('/')
       expect(task.XHR.method).toBe('GET')
     }
-    zoneService.spec.onBeforeInvokeTask = function (task) {
+    zoneService.spec.onBeforeInvokeTask = function () {
       expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
     }
-    zoneService.spec.onInvokeTask = function (task) {
+    zoneService.spec.onInvokeTask = function () {
       expect(response).toBeDefined()
       expect(zoneService.spec.onBeforeInvokeTask).toHaveBeenCalled()
       expect(readyStateChangeSpy).toHaveBeenCalled()
@@ -64,7 +64,7 @@ xdescribe('ZoneService', function () {
       // In zone.js@0.8.12-prm readystatechange is not registered by default on every request
       oReq.addEventListener('readystatechange', readyStateChangeSpy)
       oReq.addEventListener('load', reqListener)
-      oReq.addEventListener('error', function (event) {
+      oReq.addEventListener('error', function () {
         console.log('failed')
       })
 
@@ -77,13 +77,13 @@ xdescribe('ZoneService', function () {
     var response
     var readyStateChangeSpy = jasmine.createSpy('readyStateChangeSpy')
 
-    zoneService.spec.onScheduleTask = function (task) {
+    zoneService.spec.onScheduleTask = function () {
       expect(response).toBeUndefined()
     }
-    zoneService.spec.onBeforeInvokeTask = function (task) {
+    zoneService.spec.onBeforeInvokeTask = function () {
       expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
     }
-    zoneService.spec.onInvokeTask = function (task) {
+    zoneService.spec.onInvokeTask = function () {
       expect(response).toBeDefined()
       expect(zoneService.spec.onBeforeInvokeTask).toHaveBeenCalled()
       expect(readyStateChangeSpy).toHaveBeenCalled()
@@ -111,7 +111,7 @@ xdescribe('ZoneService', function () {
       oReq.send(null)
       oReq.addEventListener('readystatechange', readyStateChangeSpy)
       oReq.addEventListener('load', reqListener)
-      oReq.addEventListener('error', function (event) {
+      oReq.addEventListener('error', function () {
         console.log('failed')
       })
     })
@@ -120,7 +120,7 @@ xdescribe('ZoneService', function () {
   it('should keep track of tasks even if no event listeners are registered', function (done) {
     resetZoneCallbacks(zoneService)
 
-    zoneService.spec.onInvokeTask = function (task) {
+    zoneService.spec.onInvokeTask = function () {
       expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
 
       // should call done asynchronously since we're spying in this function in multiple tests
@@ -147,13 +147,13 @@ xdescribe('ZoneService', function () {
 
     resetZoneCallbacks(zoneService)
 
-    zoneService.spec.onScheduleTask = function (task) {
+    zoneService.spec.onScheduleTask = function () {
       expect(response).toBeUndefined()
     }
-    zoneService.spec.onBeforeInvokeTask = function (task) {
+    zoneService.spec.onBeforeInvokeTask = function () {
       expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
     }
-    zoneService.spec.onInvokeTask = function (task) {
+    zoneService.spec.onInvokeTask = function () {
       expect(response).toBeDefined()
       expect(zoneService.spec.onBeforeInvokeTask).toHaveBeenCalled()
 
@@ -178,7 +178,7 @@ xdescribe('ZoneService', function () {
 
       var oReq = new window.XMLHttpRequest()
       oReq.addEventListener('readystatechange', reqListener)
-      oReq.addEventListener('error', function (event) {
+      oReq.addEventListener('error', function () {
         console.log('failed')
       })
 
@@ -217,7 +217,7 @@ xdescribe('ZoneService', function () {
     // zoneService = new ZoneService(window.Zone.current.parent, logger)
     resetZoneCallbacks(zoneService)
 
-    zoneService.spec.onInvokeTask = function (task) {
+    zoneService.spec.onInvokeTask = function () {
       expect(callbackFlag).toBe(true)
       expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
       done()
@@ -237,7 +237,7 @@ xdescribe('ZoneService', function () {
     var callbackFlag = false
     resetZoneCallbacks(zoneService)
 
-    zoneService.spec.onInvokeTask = function (task) {
+    zoneService.spec.onInvokeTask = function () {
       expect(callbackFlag).toBe(true)
       expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
       done()
@@ -266,7 +266,7 @@ xdescribe('ZoneService', function () {
     // zoneService = new ZoneService(window.Zone.current.parent, logger)
     resetZoneCallbacks(zoneService)
 
-    zoneService.spec.onInvokeTask = function (task) {
+    zoneService.spec.onInvokeTask = function () {
       expect(callbackFlag).toBe(true)
       expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
       done()

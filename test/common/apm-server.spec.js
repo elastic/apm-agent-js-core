@@ -324,7 +324,7 @@ describe('ApmServer', function () {
     configService.setConfig({
       serviceName: 'serviceName'
     })
-    configService.addFilter(function (payload) {})
+    configService.addFilter(function () {})
     spyOn(apmServer, '_postJson')
     var result = apmServer.sendErrors([{ test: 'test' }])
     expect(result).toBeUndefined()

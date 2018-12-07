@@ -168,7 +168,7 @@ describe('TransactionService', function () {
     expect(tr.name).toBe('hamid-test')
   })
 
-  xit('should not add duplicate resource spans', function (done) {
+  xit('should not add duplicate resource spans', function () {
     config.set('active', true)
     config.set('capturePageLoad', true)
     transactionService = new TransactionService(logger, config)

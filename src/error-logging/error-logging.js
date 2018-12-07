@@ -37,7 +37,10 @@ class ErrorLogging {
     var message = errorEvent.message || (errorEvent.error && errorEvent.error.message)
     var errorType = errorEvent.error ? errorEvent.error.name : undefined
     if (!errorType) {
-      // Try to extract type from message formatted like 'ReferenceError: Can't find variable: initHighlighting'
+      /**
+       * Try to extract type from message formatted like
+       * 'ReferenceError: Can't find variable: initHighlighting'
+       */
       if (message && message.indexOf(':') > -1) {
         errorType = message.split(':')[0]
       } else {

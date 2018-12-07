@@ -64,7 +64,7 @@ describe('transaction.Transaction', function () {
     }, 500)
   })
 
-  xit('should not start any spans after transaction has been added to queue', function (done) {
+  xit('should not start any spans after transaction has been added to queue', function () {
     var transaction = new Transaction('/', 'transaction', {})
     transaction.end()
     var firstSpan = transaction.startSpan('first-span-name', 'first-span')

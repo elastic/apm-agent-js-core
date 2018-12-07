@@ -71,7 +71,7 @@ class ApmServer {
         }
       }
 
-      xhr.onreadystatechange = function (evt) {
+      xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
           var status = xhr.status
           if (status === 0 || (status > 399 && status < 600)) {
@@ -121,7 +121,7 @@ class ApmServer {
 
     this.throttleAddError = throttle(
       this.errorQueue.add.bind(this.errorQueue),
-      function (method, url) {
+      function () {
         apmServer._loggingService.warn('Dropped error due to throttling!')
       },
       {

@@ -25,7 +25,7 @@ TransportMock.prototype.sendTransaction = function (data, headers) {
     )
   } else {
     this.subscription.applyAll(this, ['sendTransaction', transactinData])
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve) {
       resolve()
     })
   }

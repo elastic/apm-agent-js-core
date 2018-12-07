@@ -40,7 +40,12 @@ function assertNoBrowserErrors (whitelist) {
     }
 
     if (failureEntries.length > 0) {
-      reject(new Error('Expected no errors in the browserLog but got ' + failureEntries.length + ' error(s)'))
+      reject(
+        new Error(
+          'Expected no errors in the browserLog but got ' +
+            failureEntries.length + ' error(s)'
+        )
+      )
     } else {
       resolve()
     }

@@ -143,7 +143,7 @@ describe('xhrPatch', function () {
     const req = new XMLHttpRequest()
     req.open('get', '/', true)
     req.send()
-    req.addEventListener('readystatechange', function (ev) {
+    req.addEventListener('readystatechange', function () {
       if (req.readyState >= 2) {
         expect(() => {
           req.abort()

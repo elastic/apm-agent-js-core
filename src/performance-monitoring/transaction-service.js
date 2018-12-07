@@ -5,18 +5,15 @@ var Subscription = require('../common/subscription')
 var captureHardNavigation = require('./capture-hard-navigation').captureHardNavigation
 class TransactionService {
   constructor (logger, config) {
-    this._config = config
     if (typeof config === 'undefined') {
       logger.debug('TransactionService: config is not provided')
     }
+
+    this._config = config
     this._logger = logger
-
     this.marks = {}
-
     this.currentTransaction = undefined
-
     this._subscription = new Subscription()
-
     this._alreadyCapturedPageLoad = false
   }
 

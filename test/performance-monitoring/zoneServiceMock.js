@@ -20,7 +20,7 @@ function ZoneServiceMock () {
   this.runOuter = function (fn) {
     return fn()
   }
-  this.zone.run = function (callback, applyThis, applyArgs, source) {
+  this.zone.run = function (callback, applyThis, applyArgs) {
     return callback.apply(applyThis, applyArgs)
   }
 
@@ -36,6 +36,6 @@ function ZoneServiceMock () {
     return this.zone
   }
 
-  this.initialize = function (zone) {}
+  this.initialize = noop
 }
 module.exports = ZoneServiceMock

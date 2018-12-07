@@ -426,7 +426,7 @@ describe('PerformanceMonitoring', function () {
       })
 
       window['__fetchDelegate'] = function (url) {
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve) {
           var req = new window.XMLHttpRequest()
           req.open('GET', url, true)
           req.addEventListener('readystatechange', function () {

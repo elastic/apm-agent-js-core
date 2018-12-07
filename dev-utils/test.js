@@ -17,7 +17,10 @@ function runKarma (configFile) {
 
 function runUnitTests (testConfig) {
   if (testConfig.sauceLabs) {
-    saucelabsUtils.launchSauceConnect(testConfig.sauceLabs, runKarma.bind(this, testConfig.karmaConfigFile))
+    saucelabsUtils.launchSauceConnect(
+      testConfig.sauceLabs,
+      runKarma.bind(this, testConfig.karmaConfigFile)
+    )
   } else {
     runKarma(testConfig.karmaConfigFile)
   }

@@ -96,7 +96,7 @@ Config.prototype.get = function (key) {
   )
 }
 
-Config.prototype.getEndpointUrl = function getEndpointUrl (endpoint) {
+Config.prototype.getEndpointUrl = function getEndpointUrl () {
   var url = this.get('serverUrl') + this.get('serverUrlPrefix')
   return url
 }
@@ -198,25 +198,25 @@ var _getConfigFromScript = function () {
 }
 
 function _getDataAttributesFromNode (node) {
+  if (!node) {
+    return {}
+  }
   var dataAttrs = {}
   var dataRegex = /^data-([\w-]+)$/
+  var attrs = node.attributes
+  for (var i = 0; i < attrs.length; i++) {
+    var attr = attrs[i]
+    if (dataRegex.test(attr.nodeName)) {
+      var key = attr.nodeName.match(dataRegex)[1]
 
-  if (node) {
-    var attrs = node.attributes
-    for (var i = 0; i < attrs.length; i++) {
-      var attr = attrs[i]
-      if (dataRegex.test(attr.nodeName)) {
-        var key = attr.nodeName.match(dataRegex)[1]
+      // camelCase key
+      key = utils
+        .arrayMap(key.split('-'), function (group, index) {
+          return index > 0 ? group.charAt(0).toUpperCase() + group.substring(1) : group
+        })
+        .join('')
 
-        // camelCase key
-        key = utils
-          .arrayMap(key.split('-'), function (group, index) {
-            return index > 0 ? group.charAt(0).toUpperCase() + group.substring(1) : group
-          })
-          .join('')
-
-        dataAttrs[key] = attr.value || attr.nodeValue
-      }
+      dataAttrs[key] = attr.value || attr.nodeValue
     }
   }
 

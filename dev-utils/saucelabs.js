@@ -9,7 +9,7 @@ function launchSauceConnect (userConfig, done) {
   }
 
   var tryConnect = function (maxAttempts, currAttempts, done) {
-    sauceConnectLauncher(config, function (err, sauceConnectProcess) {
+    sauceConnectLauncher(config, function (err) {
       if (err) {
         console.error(err.message)
         if (currAttempts <= maxAttempts) {
