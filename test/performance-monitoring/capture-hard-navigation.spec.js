@@ -1,7 +1,7 @@
 var navigationTiming = require('../../src/performance-monitoring/capture-hard-navigation')
 var Transaction = require('../../src/performance-monitoring/transaction')
 
-var resourceEntries = require('./resource-entries.js')
+var resourceEntries = require('../fixtures/resource-entries')
 
 var spanSnapshot = require('./navigation-timing-span-snapshot').map(mapSpan)
 

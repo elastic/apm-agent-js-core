@@ -180,6 +180,12 @@ describe('lib/utils', function () {
     expect(marks.domComplete).toBeGreaterThanOrEqual(0)
     expect(marks.loadEventEnd).toBeGreaterThanOrEqual(0)
   })
+
+  it('should getPaintTimingMarks', function () {
+    var marks = utils.getPaintTimingMarks()
+    expect(marks).toEqual({})
+  })
+
   it('should generate random ids', function () {
     var result = utils.bytesToHex(utils.rng())
     expect(result.length).toBe(32)

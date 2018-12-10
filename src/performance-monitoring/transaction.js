@@ -65,11 +65,13 @@ class Transaction {
 
   addNavigationTimingMarks () {
     var marks = utils.getNavigationTimingMarks()
+    var paintMarks = utils.getPaintTimingMarks()
     if (marks) {
       var agent = {
         timeToFirstByte: marks.responseStart,
         domInteractive: marks.domInteractive,
-        domComplete: marks.domComplete
+        domComplete: marks.domComplete,
+        firstContentfulPaint: paintMarks['first-contentful-paint']
       }
       this.addMarks({ navigationTiming: marks, agent: agent })
     }

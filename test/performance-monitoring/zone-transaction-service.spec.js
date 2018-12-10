@@ -6,7 +6,8 @@ var ZoneServiceMock = require('./zoneServiceMock.js')
 var LoggingService = require('../../src/common/logging-service')
 
 var Config = require('../../src/common/config-service')
-var resourceEntries = require('./resource-entries.js')
+var resourceEntries = require('../fixtures/resource-entries')
+var paintEntries = require('../fixtures/paint-entries')
 
 describe('ZoneTransactionService', function () {
   var transactionService
@@ -284,8 +285,11 @@ describe('ZoneTransactionService', function () {
     var _getEntriesByType = window.performance.getEntriesByType
 
     window.performance.getEntriesByType = function (type) {
-      expect(type).toBe('resource')
-      return resourceEntries
+      expect(['resource', 'paint']).toContain(type)
+      if (type === 'resource') {
+        return resourceEntries
+      }
+      return paintEntries
     }
 
     config.set('active', true)

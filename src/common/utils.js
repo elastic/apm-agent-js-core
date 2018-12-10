@@ -173,18 +173,32 @@ var navigationTimingKeys = [
 ]
 
 function getNavigationTimingMarks () {
-  if (window.performance && window.performance.timing) {
-    var timing = window.performance.timing
-    var marks = {}
-    var fetchStart = timing.fetchStart
-    navigationTimingKeys.forEach(function (timingKey) {
-      var m = timing[timingKey]
-      if (m && m >= fetchStart) {
-        marks[timingKey] = m - fetchStart
-      }
-    })
-    return marks
+  var timing = window.performance.timing
+  var fetchStart = timing.fetchStart
+  var marks = {}
+  navigationTimingKeys.forEach(function (timingKey) {
+    var m = timing[timingKey]
+    if (m && m >= fetchStart) {
+      marks[timingKey] = m - fetchStart
+    }
+  })
+  return marks
+}
+
+/**
+ * Paint Timing Metrics that is available during page load
+ * https://www.w3.org/TR/paint-timing/
+ */
+function getPaintTimingMarks () {
+  var paints = {}
+  if (window.performance.getEntriesByType) {
+    var entries = window.performance.getEntriesByType('paint')
+    for (var i = 0; i < entries.length; i++) {
+      var data = entries[i]
+      paints[data.name] = data.startTime
+    }
   }
+  return paints
 }
 
 function getPageMetadata () {
@@ -404,6 +418,7 @@ module.exports = {
   sanitizeString: sanitizeString,
   sanitizeObjectStrings: sanitizeObjectStrings,
   getNavigationTimingMarks: getNavigationTimingMarks,
+  getPaintTimingMarks: getPaintTimingMarks,
   bytesToHex: bytesToHex,
   rng: rng,
   generateRandomId: generateRandomId,

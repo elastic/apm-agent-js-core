@@ -3,7 +3,8 @@ var Transaction = require('../../src/performance-monitoring/transaction')
 var Span = require('../../src/performance-monitoring/span')
 var apmTestConfig = require('../apm-test-config')()
 
-var resourceEntries = require('./resource-entries.js')
+var resourceEntries = require('../fixtures/resource-entries')
+var paintEntries = require('../fixtures/paint-entries')
 var utils = require('../../src/common/utils')
 var patchUtils = require('../../src/common/patching/patch-utils')
 var patchSub = require('../common/patch')
@@ -260,8 +261,11 @@ describe('PerformanceMonitoring', function () {
     var _getEntriesByType = window.performance.getEntriesByType
 
     window.performance.getEntriesByType = function (type) {
-      expect(type).toBe('resource')
-      return resourceEntries
+      expect(['resource', 'paint']).toContain(type)
+      if (type === 'resource') {
+        return resourceEntries
+      }
+      return paintEntries
     }
 
     var transactionService = serviceFactory.getService('TransactionService')
@@ -282,6 +286,28 @@ describe('PerformanceMonitoring', function () {
       )
     })
     transactionService.sendPageLoadMetrics('resource-test')
+  })
+
+  it('should contain agent marks in page load transaction', function () {
+    var _getEntriesByType = window.performance.getEntriesByType
+
+    window.performance.getEntriesByType = function (type) {
+      expect(['resource', 'paint']).toContain(type)
+      if (type === 'resource') {
+        return resourceEntries
+      }
+      return paintEntries
+    }
+    var tr = new Transaction('test', 'test')
+    tr.addNavigationTimingMarks()
+
+    var agentMarks = ['timeToFirstByte', 'domInteractive', 'domComplete', 'firstContentfulPaint']
+
+    expect(Object.keys(tr.marks.agent)).toEqual(agentMarks)
+    agentMarks.forEach(function (mark) {
+      expect(tr.marks.agent[mark]).toBeGreaterThanOrEqual(0)
+    })
+    window.performance.getEntriesByType = _getEntriesByType
   })
 
   it('should filter out empty transactions', function () {

@@ -109,9 +109,8 @@ function createResourceTimingSpans (entries, filterUrls) {
 
 function captureHardNavigation (transaction) {
   if (transaction.isHardNavigation && window.performance && window.performance.timing) {
-    var baseTime = window.performance.timing.fetchStart
     var timings = window.performance.timing
-
+    var baseTime = timings.fetchStart
     // must be zero otherwise the calculated relative _start time would be wrong
     transaction._rootSpan._start = 0
     transaction.type = 'page-load'
@@ -146,7 +145,6 @@ function captureHardNavigation (transaction) {
     }
     transaction._adjustStartToEarliestSpan()
     transaction._adjustEndToLatestSpan()
-
     transaction.addNavigationTimingMarks()
   }
 }
