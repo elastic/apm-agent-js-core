@@ -106,8 +106,8 @@ function patchXMLHttpRequest (callback) {
     () =>
       function (self, args) {
         self[XHR_METHOD] = args[0]
-        self[XHR_SYNC] = args[2] === false
         self[XHR_URL] = args[1]
+        self[XHR_SYNC] = args[2] === false
         return openNative.apply(self, args)
       }
   )

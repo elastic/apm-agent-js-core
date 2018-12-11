@@ -12,17 +12,19 @@ class ServiceFactory {
   }
 
   registerCoreServices () {
-    var configService = new ConfigService()
-    var loggingService = new LoggingService()
+    var serviceFactory = this
 
     this.registerServiceCreator('ConfigService', function () {
-      return configService
+      return new ConfigService()
     })
     this.registerServiceCreator('LoggingService', function () {
-      return loggingService
+      return new LoggingService()
     })
     this.registerServiceCreator('ApmServer', function () {
-      return new ApmServer(configService, loggingService)
+      return new ApmServer(
+        serviceFactory.getService('ConfigService'),
+        serviceFactory.getService('LoggingService')
+      )
     })
 
     this.registerServiceInstance('PatchUtils', patchUtils)
