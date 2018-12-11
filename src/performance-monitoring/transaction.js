@@ -70,10 +70,12 @@ class Transaction {
       var agent = {
         timeToFirstByte: marks.responseStart,
         domInteractive: marks.domInteractive,
-        domComplete: marks.domComplete,
-        firstContentfulPaint: paintMarks['first-contentful-paint']
+        domComplete: marks.domComplete
       }
-      this.addMarks({ navigationTiming: marks, agent: agent })
+      if (paintMarks['first-contentful-paint']) {
+        agent.firstContentfulPaint = paintMarks['first-contentful-paint']
+      }
+      this.addMarks({ navigationTiming: marks, agent })
     }
   }
 
