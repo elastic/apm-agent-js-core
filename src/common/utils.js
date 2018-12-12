@@ -191,11 +191,20 @@ function getNavigationTimingMarks () {
  */
 function getPaintTimingMarks () {
   var paints = {}
-  if (window.performance.getEntriesByType) {
-    var entries = window.performance.getEntriesByType('paint')
-    for (var i = 0; i < entries.length; i++) {
-      var data = entries[i]
-      paints[data.name] = data.startTime
+  var perf = window.performance
+  if (perf.getEntriesByType) {
+    var entries = perf.getEntriesByType('paint')
+    if (entries.length > 0) {
+      var timings = perf.timing
+      /**
+       * To avoid capturing the unload event handler effect in paint timings
+       */
+      var unloadDiff = timings.fetchStart - timings.navigationStart
+      for (var i = 0; i < entries.length; i++) {
+        var data = entries[i]
+        var calcPaintTime = unloadDiff >= 0 ? data.startTime - unloadDiff : data.startTime
+        paints[data.name] = calcPaintTime
+      }
     }
   }
   return paints
