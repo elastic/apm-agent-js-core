@@ -54,7 +54,7 @@ echo " "
 if ! [[ $RESPONSE =~ ^([yY][eE][sS]|[yY])$ ]];
 then
     echo "Rolling back changes."
-    git checkout -- package.json CHANGELOG.md
+    git checkout -- package.json CHANGELOG.md package-lock.json
     exit 1
 fi
 
@@ -62,7 +62,7 @@ fi
 # BRANCH_NAME="release-$TAG_NAME"
 # git checkout -b $BRANCH_NAME
 
-git add package.json CHANGELOG.md
+git add package.json CHANGELOG.md package-lock.json
 git commit -m "chore: version $PACKAGE_VERSION"
 git tag -a $TAG_NAME -m "version $PACKAGE_VERSION"
 
