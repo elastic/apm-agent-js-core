@@ -172,6 +172,7 @@ class PerformanceMonitoring {
         type: utils.sanitizeString(span.type, stringLimit, true),
         subType: utils.sanitizeString(span.subType, stringLimit, true),
         action: utils.sanitizeString(span.action, stringLimit, true),
+        sync: span.sync,
         start: span._start - transactionStart,
         duration: span.duration(),
         context: context
