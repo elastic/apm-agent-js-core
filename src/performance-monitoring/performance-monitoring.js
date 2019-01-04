@@ -1,6 +1,15 @@
-var utils = require('../common/utils')
-var patchingSub = require('../common/patching').subscription
-var patchUtils = require('../common/patching/patch-utils')
+const {
+  sanitizeObjectStrings,
+  sanitizeString,
+  checkSameOrigin,
+  isDtHeaderValid,
+  getDtHeaderValue,
+  merge,
+  stripQueryStringFromUrl
+} = require('../common/utils')
+const patchingSub = require('../common/patching').subscription
+const { globalState } = require('../common/patching/patch-utils')
+const { SCHEDULE, INVOKE, XMLHTTPREQUEST_SOURCE, FETCH_SOURCE } = require('../common/constants')
 
 class PerformanceMonitoring {
   constructor (apmServer, configService, loggingService, zoneService, transactionService) {
@@ -32,29 +41,28 @@ class PerformanceMonitoring {
     var transactionService = this._transactionService
     return function (event, task) {
       if (
-        (task.source === patchUtils.XMLHTTPREQUEST_SOURCE &&
-          !patchUtils.globalState.fetchInProgress) ||
-        task.source === patchUtils.FETCH_SOURCE
+        (task.source === XMLHTTPREQUEST_SOURCE && !globalState.fetchInProgress) ||
+        task.source === FETCH_SOURCE
       ) {
-        if (event === patchUtils.SCHEDULE && task.data) {
-          var spanName = task.data.method + ' ' + utils.stripQueryStringFromUrl(task.data.url)
+        if (event === SCHEDULE && task.data) {
+          var spanName = task.data.method + ' ' + stripQueryStringFromUrl(task.data.url)
           var span = transactionService.startSpan(spanName, 'external.http')
           if (span) {
             var isDtEnabled = configService.get('distributedTracing')
             var origins = configService.get('distributedTracingOrigins')
             var isSameOrigin =
-              utils.isSameOrigin(task.data.url, window.location.href) ||
-              utils.isSameOrigin(task.data.url, origins)
+              checkSameOrigin(task.data.url, window.location.href) ||
+              checkSameOrigin(task.data.url, origins)
             var target = task.data.target
             if (isDtEnabled && isSameOrigin && target) {
               var headerName = configService.get('distributedTracingHeaderName')
               var headerValueCallback = configService.get('distributedTracingHeaderValueCallback')
               if (typeof headerValueCallback !== 'function') {
-                headerValueCallback = utils.getDtHeaderValue
+                headerValueCallback = getDtHeaderValue
               }
 
               var headerValue = headerValueCallback(span)
-              var isHeaderValid = utils.isDtHeaderValid(headerValue)
+              var isHeaderValid = isDtHeaderValid(headerValue)
               if (headerName && headerValue && isHeaderValid) {
                 if (typeof target.setRequestHeader === 'function') {
                   target.setRequestHeader(headerName, headerValue)
@@ -72,7 +80,7 @@ class PerformanceMonitoring {
             span.sync = task.data.sync
             task.data.span = span
           }
-        } else if (event === patchUtils.INVOKE && task.data && task.data.span) {
+        } else if (event === INVOKE && task.data && task.data.span) {
           if (typeof task.data.target.status !== 'undefined') {
             task.data.span.addContext({ http: { status_code: task.data.target.status } })
           } else if (task.data.response) {
@@ -161,17 +169,17 @@ class PerformanceMonitoring {
     var spans = transaction.spans.map(function (span) {
       var context
       if (span.context) {
-        context = utils.sanitizeObjectStrings(span.context, stringLimit)
+        context = sanitizeObjectStrings(span.context, stringLimit)
       }
       return {
         id: span.id,
         transaction_id: transaction.id,
         parent_id: span.parentId || transaction.id,
         trace_id: transaction.traceId,
-        name: utils.sanitizeString(span.name, stringLimit, true),
-        type: utils.sanitizeString(span.type, stringLimit, true),
-        subType: utils.sanitizeString(span.subType, stringLimit, true),
-        action: utils.sanitizeString(span.action, stringLimit, true),
+        name: sanitizeString(span.name, stringLimit, true),
+        type: sanitizeString(span.type, stringLimit, true),
+        subType: sanitizeString(span.subType, stringLimit, true),
+        action: sanitizeString(span.action, stringLimit, true),
         sync: span.sync,
         start: span._start - transactionStart,
         duration: span.duration(),
@@ -179,12 +187,12 @@ class PerformanceMonitoring {
       }
     })
 
-    var context = utils.merge({}, configContext, transaction.context)
+    var context = merge({}, configContext, transaction.context)
     return {
       id: transaction.id,
       trace_id: transaction.traceId,
-      name: utils.sanitizeString(transaction.name, stringLimit, false),
-      type: utils.sanitizeString(transaction.type, stringLimit, true),
+      name: sanitizeString(transaction.name, stringLimit, false),
+      type: sanitizeString(transaction.type, stringLimit, true),
       duration: transaction.duration(),
       spans: spans,
       context: context,

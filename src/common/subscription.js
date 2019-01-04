@@ -1,9 +1,9 @@
 class Subscription {
-  constructor() {
+  constructor () {
     this.subscriptions = []
   }
 
-  subscribe(fn) {
+  subscribe (fn) {
     this.subscriptions.push(fn)
 
     return () => {
@@ -14,7 +14,7 @@ class Subscription {
     }
   }
 
-  applyAll(applyTo, applyWith) {
+  applyAll (applyTo, applyWith) {
     this.subscriptions.forEach(fn => {
       try {
         fn.apply(applyTo, applyWith)

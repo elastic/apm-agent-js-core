@@ -1,26 +1,24 @@
-var patchUtils = require('./patch-utils')
+const {
+  apmSymbol,
+  patchMethod,
+  XHR_SYNC,
+  XHR_URL,
+  XHR_METHOD,
+  XHR_IGNORE
+} = require('./patch-utils')
 
-const apmSymbol = patchUtils.apmSymbol
-const patchMethod = patchUtils.patchMethod
+const {
+  SCHEDULE,
+  INVOKE,
+  CLEAR,
+  XMLHTTPREQUEST_SOURCE,
+  ADD_EVENT_LISTENER_STR,
+  REMOVE_EVENT_LISTENER_STR
+} = require('../constants')
 
 const XHR_TASK = apmSymbol('xhrTask')
 const XHR_LISTENER = apmSymbol('xhrListener')
 const XHR_SCHEDULED = apmSymbol('xhrScheduled')
-
-const XHR_SYNC = patchUtils.XHR_SYNC
-const XHR_URL = patchUtils.XHR_URL
-const XHR_METHOD = patchUtils.XHR_METHOD
-
-const ADD_EVENT_LISTENER_STR = 'addEventListener'
-const REMOVE_EVENT_LISTENER_STR = 'removeEventListener'
-
-var XHR_IGNORE = patchUtils.XHR_IGNORE
-
-const XMLHTTPREQUEST_SOURCE = patchUtils.XMLHTTPREQUEST_SOURCE
-
-const SCHEDULE = patchUtils.SCHEDULE
-const INVOKE = patchUtils.INVOKE
-const CLEAR = patchUtils.CLEAR
 
 var alreadyPatched = false
 function patchXMLHttpRequest (callback) {

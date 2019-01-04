@@ -17,6 +17,6 @@ function patchAll () {
 }
 
 module.exports = {
-  patchAll: patchAll,
-  subscription: subscription
+  patchAll,
+  subscription
 }

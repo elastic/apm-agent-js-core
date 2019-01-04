@@ -1,11 +1,13 @@
 const constants = require('./constants')
-var slice = [].slice
+const slice = [].slice
+const URL = require('url-parse/dist/url-parse')
+const rng = require('uuid/lib/rng-browser')
 
 function isCORSSupported () {
   var xhr = new window.XMLHttpRequest()
   return 'withCredentials' in xhr
 }
-var rng = require('uuid/lib/rng-browser')
+
 var byteToHex = []
 for (var i = 0; i < 256; ++i) {
   byteToHex[i] = (i + 0x100).toString(16).substr(1)
@@ -68,10 +70,10 @@ function parseUrl (url) {
   }
 }
 
-var dtVersion = '00'
-var dtUnSampledFlags = '00'
+const dtVersion = '00'
+const dtUnSampledFlags = '00'
 // 00000001 ->  '01' -> recorded
-var dtSampledFlags = '01'
+const dtSampledFlags = '01'
 function getDtHeaderValue (span) {
   if (span && span.traceId && span.id) {
     var flags = span.sampled ? dtSampledFlags : dtUnSampledFlags
@@ -100,9 +102,7 @@ function isDtHeaderValid (header) {
   )
 }
 
-var URL = require('url-parse/dist/url-parse')
-
-function isSameOrigin (source, target) {
+function checkSameOrigin (source, target) {
   var isSame = false
   if (typeof target === 'string') {
     var src = new URL(source)
@@ -111,7 +111,7 @@ function isSameOrigin (source, target) {
   } else if (Array.isArray(target)) {
     target.forEach(function (t) {
       if (!isSame) {
-        isSame = isSameOrigin(source, t)
+        isSame = checkSameOrigin(source, t)
       }
     })
   }
@@ -174,7 +174,7 @@ function sanitizeObjectStrings (obj, limit, required, placeholder) {
   return obj
 }
 
-var navigationTimingKeys = [
+const navigationTimingKeys = [
   'fetchStart',
   'domainLookupStart',
   'domainLookupEnd',
@@ -248,41 +248,67 @@ function stripQueryStringFromUrl (url) {
   return url && url.split('?')[0]
 }
 
-module.exports = {
-  getPageMetadata: getPageMetadata,
+function isObject (value) {
+  // http://jsperf.com/isobject4
+  return value !== null && typeof value === 'object'
+}
 
+function isFunction (value) {
+  return typeof value === 'function'
+}
+
+function baseExtend (dst, objs, deep) {
+  for (var i = 0, ii = objs.length; i < ii; ++i) {
+    var obj = objs[i]
+    if (!isObject(obj) && !isFunction(obj)) continue
+    var keys = Object.keys(obj)
+    for (var j = 0, jj = keys.length; j < jj; j++) {
+      var key = keys[j]
+      var src = obj[key]
+
+      if (deep && isObject(src)) {
+        if (!isObject(dst[key])) dst[key] = Array.isArray(src) ? [] : {}
+        baseExtend(dst[key], [src], false) // only one level of deep merge
+      } else {
+        dst[key] = src
+      }
+    }
+  }
+
+  return dst
+}
+
+function getElasticScript () {
+  if (typeof document !== 'undefined') {
+    var scripts = document.getElementsByTagName('script')
+    for (var i = 0, l = scripts.length; i < l; i++) {
+      var sc = scripts[i]
+      if (sc.src.indexOf('elastic') > 0) {
+        return sc
+      }
+    }
+  }
+}
+
+function getCurrentScript () {
+  if (typeof document !== 'undefined') {
+    // Source http://www.2ality.com/2014/05/current-script.html
+    var currentScript = document.currentScript
+    if (!currentScript) {
+      return getElasticScript()
+    }
+    return currentScript
+  }
+}
+
+module.exports = {
   extend: function extend (dst) {
-    return this.baseExtend(dst, slice.call(arguments, 1), false)
+    return baseExtend(dst, slice.call(arguments, 1), false)
   },
 
   merge: function merge (dst) {
-    return this.baseExtend(dst, slice.call(arguments, 1), true)
+    return baseExtend(dst, slice.call(arguments, 1), true)
   },
-
-  baseExtend: function baseExtend (dst, objs, deep) {
-    for (var i = 0, ii = objs.length; i < ii; ++i) {
-      var obj = objs[i]
-      if (!isObject(obj) && !isFunction(obj)) continue
-      var keys = Object.keys(obj)
-      for (var j = 0, jj = keys.length; j < jj; j++) {
-        var key = keys[j]
-        var src = obj[key]
-
-        if (deep && isObject(src)) {
-          if (!isObject(dst[key])) dst[key] = Array.isArray(src) ? [] : {}
-          baseExtend(dst[key], [src], false) // only one level of deep merge
-        } else {
-          dst[key] = src
-        }
-      }
-    }
-
-    return dst
-  },
-
-  isObject: isObject,
-
-  isFunction: isFunction,
 
   arrayReduce: function (arrayValue, callback, value) {
     // Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
@@ -425,56 +451,29 @@ module.exports = {
     return typeof obj === 'undefined'
   },
 
-  isCORSSupported: isCORSSupported,
-  getElasticScript: function () {
-    if (typeof document !== 'undefined') {
-      var scripts = document.getElementsByTagName('script')
-      for (var i = 0, l = scripts.length; i < l; i++) {
-        var sc = scripts[i]
-        if (sc.src.indexOf('elastic') > 0) {
-          return sc
-        }
-      }
-    }
-  },
-
-  getCurrentScript: function () {
-    if (typeof document !== 'undefined') {
-      // Source http://www.2ality.com/2014/05/current-script.html
-      var currentScript = document.currentScript
-      if (!currentScript) {
-        return this.getElasticScript()
-      }
-      return currentScript
-    }
-  },
-
-  parseUrl: parseUrl,
-
-  isPlatformSupported: isPlatformSupported,
-
-  sanitizeString: sanitizeString,
-  sanitizeObjectStrings: sanitizeObjectStrings,
-  getNavigationTimingMarks: getNavigationTimingMarks,
-  getPaintTimingMarks: getPaintTimingMarks,
-  bytesToHex: bytesToHex,
-  rng: rng,
-  generateRandomId: generateRandomId,
-  isSameOrigin: isSameOrigin,
-  getDtHeaderValue: getDtHeaderValue,
-  isDtHeaderValid: isDtHeaderValid,
-  setTag: setTag,
   noop: function () {},
+  baseExtend,
+  getPageMetadata,
+  isCORSSupported,
+  isObject,
+  isFunction,
+  isPlatformSupported,
+  parseUrl,
+  parseDtHeaderValue,
+  sanitizeString,
+  sanitizeObjectStrings,
+  getNavigationTimingMarks,
+  getPaintTimingMarks,
+  bytesToHex,
+  rng,
+  getCurrentScript,
+  getElasticScript,
   getTimeOrigin,
   parseDtHeaderValue,
-  stripQueryStringFromUrl
-}
-
-function isObject (value) {
-  // http://jsperf.com/isobject4
-  return value !== null && typeof value === 'object'
-}
-
-function isFunction (value) {
-  return typeof value === 'function'
+  stripQueryStringFromUrl,
+  generateRandomId,
+  checkSameOrigin,
+  getDtHeaderValue,
+  isDtHeaderValid,
+  setTag
 }

@@ -1,9 +1,10 @@
-var ApmServer = require('./apm-server')
-var ConfigService = require('./config-service')
-var LoggingService = require('./logging-service')
+const ApmServer = require('./apm-server')
+const ConfigService = require('./config-service')
+const LoggingService = require('./logging-service')
 
-var patchUtils = require('./patching/patch-utils')
-var utils = require('./utils')
+const patchUtils = require('./patching/patch-utils')
+const utils = require('./utils')
+
 class ServiceFactory {
   constructor () {
     this._serviceCreators = {}

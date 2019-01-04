@@ -1,13 +1,14 @@
-var createServiceFactory = require('..').createServiceFactory
-var Transaction = require('../../src/performance-monitoring/transaction')
-var Span = require('../../src/performance-monitoring/span')
-var apmTestConfig = require('../apm-test-config')()
+const createServiceFactory = require('..').createServiceFactory
+const Transaction = require('../../src/performance-monitoring/transaction')
+const Span = require('../../src/performance-monitoring/span')
+const apmTestConfig = require('../apm-test-config')()
 
-var resourceEntries = require('../fixtures/resource-entries')
-var paintEntries = require('../fixtures/paint-entries')
-var utils = require('../../src/common/utils')
-var patchUtils = require('../../src/common/patching/patch-utils')
-var patchSub = require('../common/patch')
+const resourceEntries = require('../fixtures/resource-entries')
+const paintEntries = require('../fixtures/paint-entries')
+const utils = require('../../src/common/utils')
+const { globalState } = require('../../src/common/patching/patch-utils')
+const { SCHEDULE } = require('../../src/common/constants')
+const patchSub = require('../common/patch')
 
 describe('PerformanceMonitoring', function () {
   var serviceFactory
@@ -391,11 +392,11 @@ describe('PerformanceMonitoring', function () {
       }
     })
 
-    patchUtils.globalState.fetchInProgress = true
+    globalState.fetchInProgress = true
     fn('schedule', task)
     expect(task.data.span).toBeUndefined()
 
-    patchUtils.globalState.fetchInProgress = false
+    globalState.fetchInProgress = false
     fn('schedule', task)
     req.send()
     expect(task.data.span).toBeDefined()
@@ -408,7 +409,7 @@ describe('PerformanceMonitoring', function () {
       var dTHeaderValue
       performanceMonitoring.cancelPatchSub = patchSub.subscribe(function (event, task) {
         fn(event, task)
-        if (event === patchUtils.SCHEDULE) {
+        if (event === SCHEDULE) {
           dTHeaderValue = task.data.target.headers.get(
             configService.get('distributedTracingHeaderName')
           )
@@ -460,9 +461,9 @@ describe('PerformanceMonitoring', function () {
           })
 
           // Can't rely on the fetch-patch to set this flag because of the way karma executes tests
-          patchUtils.globalState.fetchInProgress = true
+          globalState.fetchInProgress = true
           req.send()
-          patchUtils.globalState.fetchInProgress = false
+          globalState.fetchInProgress = false
         })
       }
       var transactionService = performanceMonitoring._transactionService

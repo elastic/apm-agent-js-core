@@ -201,16 +201,16 @@ describe('lib/utils', function () {
   })
 
   it('should identify same origin urls', function () {
-    var result = utils.isSameOrigin('/test/new', window.location.href)
+    var result = utils.checkSameOrigin('/test/new', window.location.href)
     expect(result).toBe(true)
-    result = utils.isSameOrigin('http:test.com/test/new', window.location.href)
+    result = utils.checkSameOrigin('http:test.com/test/new', window.location.href)
     expect(result).toBe(false)
-    result = utils.isSameOrigin('http://test.com/test/new', [
+    result = utils.checkSameOrigin('http://test.com/test/new', [
       window.location.href,
       'http://test.com'
     ])
     expect(result).toBe(true)
-    result = utils.isSameOrigin('http://test.com/test/new', [
+    result = utils.checkSameOrigin('http://test.com/test/new', [
       window.location.href,
       'http://test1.com',
       'not-url:3000',
@@ -218,17 +218,17 @@ describe('lib/utils', function () {
       undefined
     ])
     expect(result).toBe(false)
-    result = utils.isSameOrigin('http://test.com/test/new', undefined)
+    result = utils.checkSameOrigin('http://test.com/test/new', undefined)
     expect(result).toBe(false)
-    result = utils.isSameOrigin(undefined, 'http://test.com/test/new')
+    result = utils.checkSameOrigin(undefined, 'http://test.com/test/new')
     expect(result).toBe(false)
-    result = utils.isSameOrigin({}, 'http://test.com/')
+    result = utils.checkSameOrigin({}, 'http://test.com/')
     expect(result).toBe(false)
-    result = utils.isSameOrigin('test test', 'http://test.com/')
+    result = utils.checkSameOrigin('test test', 'http://test.com/')
     expect(result).toBe(false)
-    result = utils.isSameOrigin('/test', 'http://test.com/')
+    result = utils.checkSameOrigin('/test', 'http://test.com/')
     expect(result).toBe(false)
-    result = utils.isSameOrigin('', 'http://test.com/')
+    result = utils.checkSameOrigin('', 'http://test.com/')
     expect(result).toBe(false)
   })
 

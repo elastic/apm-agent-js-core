@@ -1,4 +1,4 @@
-function noop () {}
+const { noop } = require('./utils')
 
 class LoggingService {
   constructor (spec) {
@@ -13,10 +13,12 @@ class LoggingService {
   shouldLog (level) {
     return this.levels.indexOf(level) >= this.levels.indexOf(this.level)
   }
+
   setLevel (level) {
     this.level = level
     this.resetLogMethods()
   }
+
   resetLogMethods () {
     var loggingService = this
     this.levels.forEach(function (level) {

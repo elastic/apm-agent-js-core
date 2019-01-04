@@ -1,8 +1,8 @@
-var patchUtils = require('../../src/common/patching/patch-utils')
+const { XHR_IGNORE, XHR_METHOD, XHR_URL } = require('../../src/common/patching/patch-utils')
 
-var urlSympbol = patchUtils.XHR_URL
-var methodSymbol = patchUtils.XHR_METHOD
-var xhrIgnore = patchUtils.XHR_IGNORE
+var urlSympbol = XHR_URL
+var methodSymbol = XHR_METHOD
+var xhrIgnore = XHR_IGNORE
 
 var patchSubscription = require('./patch')
 

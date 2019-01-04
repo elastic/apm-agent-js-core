@@ -1,6 +1,6 @@
 require('./patch')
-var patchSubscription = window['__patchSubscription']
-var patchUtils = require('../../src/common/patching/patch-utils')
+const patchSubscription = window['__patchSubscription']
+const { globalState } = require('../../src/common/patching/patch-utils')
 
 describe('xhrPatch', function () {
   var events = []
@@ -82,9 +82,9 @@ describe('xhrPatch', function () {
       })
     })
     it('should reset fetchInProgress global state', function () {
-      expect(patchUtils.globalState.fetchInProgress).toBe(false)
+      expect(globalState.fetchInProgress).toBe(false)
       window.fetch('http://localhost:54321/')
-      expect(patchUtils.globalState.fetchInProgress).toBe(false)
+      expect(globalState.fetchInProgress).toBe(false)
     })
   }
 })

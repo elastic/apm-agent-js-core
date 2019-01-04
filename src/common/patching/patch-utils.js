@@ -1,10 +1,3 @@
-const SCHEDULE = 'schedule'
-const INVOKE = 'invoke'
-const CLEAR = 'clear'
-
-const FETCH_SOURCE = 'fetch'
-const XMLHTTPREQUEST_SOURCE = 'XMLHttpRequest.send'
-
 var globalState = {
   fetchInProgress: false
 }
@@ -58,14 +51,9 @@ function patchMethod (target, name, patchFn) {
 }
 
 module.exports = {
-  apmSymbol: apmSymbol,
-  patchMethod: patchMethod,
-  globalState: globalState,
-  SCHEDULE,
-  INVOKE,
-  CLEAR,
-  FETCH_SOURCE,
-  XMLHTTPREQUEST_SOURCE,
+  apmSymbol,
+  patchMethod,
+  globalState,
   XHR_IGNORE: apmSymbol('xhrIgnore'),
   XHR_SYNC: apmSymbol('xhrSync'),
   XHR_URL: apmSymbol('xhrURL'),

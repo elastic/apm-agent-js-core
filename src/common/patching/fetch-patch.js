@@ -1,9 +1,5 @@
-var patchUtils = require('./patch-utils')
-
-const SCHEDULE = patchUtils.SCHEDULE
-const INVOKE = patchUtils.INVOKE
-
-const FETCH_SOURCE = patchUtils.FETCH_SOURCE
+const { globalState } = require('./patch-utils')
+const { SCHEDULE, INVOKE, FETCH_SOURCE } = require('../constants')
 
 var alreadyPatched = false
 
@@ -57,7 +53,7 @@ function patchFetch (callback) {
     }
 
     return new Promise(function (resolve, reject) {
-      patchUtils.globalState.fetchInProgress = true
+      globalState.fetchInProgress = true
       scheduleTask(task)
       var promise
       try {
@@ -66,7 +62,7 @@ function patchFetch (callback) {
         reject(error)
         task.data.error = error
         invokeTask(task)
-        patchUtils.globalState.fetchInProgress = false
+        globalState.fetchInProgress = false
         return
       }
 
@@ -82,7 +78,7 @@ function patchFetch (callback) {
           invokeTask(task)
         }
       )
-      patchUtils.globalState.fetchInProgress = false
+      globalState.fetchInProgress = false
     })
   }
 }

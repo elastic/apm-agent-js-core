@@ -94,7 +94,10 @@ describe('ZoneTransactionService', function () {
     var tr = new Transaction('transaction', 'transaction')
     transactionService.setCurrentTransaction(tr)
     expect(tr._scheduledTasks).toEqual({})
-    zoneServiceMock.spec.onScheduleTask({ source: 'setTimeout', taskId: 'setTimeout1' })
+    zoneServiceMock.spec.onScheduleTask({
+      source: 'setTimeout',
+      taskId: 'setTimeout1'
+    })
     zoneServiceMock.spec.onScheduleTask({
       source: 'XMLHttpRequest.send',
       taskId: 'XMLHttpRequest.send1',
@@ -113,8 +116,13 @@ describe('ZoneTransactionService', function () {
       setTimeout1: 'setTimeout1',
       'XMLHttpRequest.send1': 'XMLHttpRequest.send1'
     })
-    zoneServiceMock.spec.onInvokeTask({ source: 'setTimeout', taskId: 'setTimeout1' })
-    expect(tr._scheduledTasks).toEqual({ 'XMLHttpRequest.send1': 'XMLHttpRequest.send1' })
+    zoneServiceMock.spec.onInvokeTask({
+      source: 'setTimeout',
+      taskId: 'setTimeout1'
+    })
+    expect(tr._scheduledTasks).toEqual({
+      'XMLHttpRequest.send1': 'XMLHttpRequest.send1'
+    })
     zoneServiceMock.spec.onCancelTask({
       source: 'XMLHttpRequest.send',
       taskId: 'XMLHttpRequest.send1'
@@ -262,7 +270,10 @@ describe('ZoneTransactionService', function () {
             fail()
           })
 
-          var xhrTask = { source: 'XMLHttpRequest.send', XHR: { url: testUrl, method: 'GET' } }
+          var xhrTask = {
+            source: 'XMLHttpRequest.send',
+            XHR: { url: testUrl, method: 'GET' }
+          }
           zoneServiceMock.spec.onScheduleTask(xhrTask)
           zoneServiceMock.spec.onInvokeTask(xhrTask)
         })

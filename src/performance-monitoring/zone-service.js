@@ -1,15 +1,15 @@
-var Subscription = require('../common/subscription')
-var patchUtils = require('../common/patching/patch-utils')
-var apmTaskSymbol = patchUtils.apmSymbol('taskData')
+const Subscription = require('../common/subscription')
+const { apmSymbol } = require('../common/patching/patch-utils')
+const { XMLHTTPREQUEST_SOURCE } = require('../common/constants')
+const { noop } = require('../common/utils')
 
-var urlSympbol = patchUtils.apmSymbol('url')
-var methodSymbol = patchUtils.apmSymbol('method')
+const apmTaskSymbol = apmSymbol('taskData')
+const urlSympbol = apmSymbol('url')
+const methodSymbol = apmSymbol('method')
+const apmDataSymbol = apmSymbol('apmData')
 
-var XMLHttpRequestSend = 'XMLHttpRequest.send'
-
-var apmDataSymbol = patchUtils.apmSymbol('apmData')
-
-var testTransactionAfterEvents = [
+// leave these out for now: 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover',
+const testTransactionAfterEvents = [
   'click',
   'contextmenu',
   'dblclick',
@@ -17,8 +17,8 @@ var testTransactionAfterEvents = [
   'keydown',
   'keypress',
   'keyup'
-] // leave these out for now: 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover',
-var testTransactionAfterEventsObj = {}
+]
+const testTransactionAfterEventsObj = {}
 testTransactionAfterEvents.forEach(function (ev) {
   testTransactionAfterEventsObj[ev] = 1
 })
@@ -29,7 +29,6 @@ function ZoneService (logger) {
   var nextId = 0
 
   // var zoneService = this
-  function noop () {}
   var spec = (this.spec = {
     onScheduleTask: noop,
     onBeforeInvokeTask: noop,
@@ -76,7 +75,7 @@ function ZoneService (logger) {
             task[apmTaskSymbol] = apmTask
             spec.onScheduleTask(apmTask)
           }
-        } else if (task.source === XMLHttpRequestSend) {
+        } else if (task.source === XMLHTTPREQUEST_SOURCE) {
           /*
                   "XMLHttpRequest.addEventListener:load"
                   "XMLHttpRequest.addEventListener:error"
@@ -167,7 +166,7 @@ function ZoneService (logger) {
           spec.onBeforeInvokeTask(apmTask)
         } else if (apmTask && eventName === 'load' && 'load' in apmData.registeredEventListeners) {
           apmData.registeredEventListeners.load.resolved = true
-        } else if (apmTask && task.source === XMLHttpRequestSend) {
+        } else if (apmTask && task.source === XMLHTTPREQUEST_SOURCE) {
           apmTask.XHR.resolved = true
         }
 
@@ -217,7 +216,7 @@ function ZoneService (logger) {
       // logger.trace('Zone: ', targetZone.name)
       var apmTask
       if (task.type === 'macroTask') {
-        if (task.source === XMLHttpRequestSend) {
+        if (task.source === XMLHTTPREQUEST_SOURCE) {
           apmTask = task.data.target[apmDataSymbol].task
           spec.onCancelTask(apmTask)
         } else if (task[apmTaskSymbol] && task.source === 'setTimeout') {

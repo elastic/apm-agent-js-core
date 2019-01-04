@@ -1,5 +1,6 @@
-var TransactionService = require('./transaction-service')
-var utils = require('../common/utils')
+const TransactionService = require('./transaction-service')
+const utils = require('../common/utils')
+const { XMLHTTPREQUEST_SOURCE } = require('../common/constants')
 
 class ZoneTransactionService extends TransactionService {
   constructor (zoneService, logger, config) {
@@ -9,14 +10,14 @@ class ZoneTransactionService extends TransactionService {
 
     this._zoneService = zoneService
     function onBeforeInvokeTask (task) {
-      if (task.source === 'XMLHttpRequest.send' && task.span && !task.span.ended) {
+      if (task.source === XMLHTTPREQUEST_SOURCE && task.span && !task.span.ended) {
         task.span.end()
       }
     }
     zoneService.spec.onBeforeInvokeTask = onBeforeInvokeTask
 
     function onScheduleTask (task) {
-      if (task.source === 'XMLHttpRequest.send') {
+      if (task.source === XMLHTTPREQUEST_SOURCE) {
         var url = task['XHR']['url']
         var spanName = task['XHR']['method'] + ' '
         if (transactionService._config.get('includeXHRQueryString')) {
@@ -38,7 +39,7 @@ class ZoneTransactionService extends TransactionService {
     zoneService.spec.onScheduleTask = onScheduleTask
 
     function onInvokeTask (task) {
-      if (task.source === 'XMLHttpRequest.send' && task.span && !task.span.ended) {
+      if (task.source === XMLHTTPREQUEST_SOURCE && task.span && !task.span.ended) {
         task.span.end()
       }
       transactionService.removeTask(task.taskId)
