@@ -5,7 +5,6 @@ const {
   arraySome,
   sanitizeString,
   setTag,
-  functionBind,
   arrayIndexOf,
   merge
 } = require('./utils')
@@ -53,14 +52,11 @@ class Config {
       serverUrl: 'http://localhost:8200',
       serverUrlPrefix: '/intake/v2/rum/events',
       active: true,
-      isInstalled: false,
       debug: false,
       logLevel: 'warn',
-      // performance monitoring
       browserResponsivenessInterval: 500,
       browserResponsivenessBuffer: 3,
       checkBrowserResponsiveness: true,
-      enable: true,
       groupSimilarSpans: true,
       similarSpanThreshold: 0.05,
       includeXHRQueryString: false,
@@ -101,6 +97,11 @@ class Config {
     this.filters = []
   }
 
+  init () {
+    var scriptData = getConfigFromScript()
+    this.setConfig(scriptData)
+  }
+
   isActive () {
     return this.get('active')
   }
@@ -122,11 +123,6 @@ class Config {
     return data
   }
 
-  init () {
-    var scriptData = getConfigFromScript()
-    this.setConfig(scriptData)
-  }
-
   get (key) {
     return arrayReduce(
       key.split('.'),
@@ -141,6 +137,7 @@ class Config {
     var url = this.get('serverUrl') + this.get('serverUrlPrefix')
     return url
   }
+
   set (key, value) {
     var levels = key.split('.')
     var maxLevel = levels.length - 1
@@ -199,19 +196,10 @@ class Config {
   }
 
   addTags (tags) {
-    var configService = this
     var keys = Object.keys(tags)
-    keys.forEach(function (k) {
-      configService.setTag(k, tags[k])
+    keys.forEach(k => {
+      this.setTag(k, tags[k])
     })
-  }
-
-  getAgentName () {
-    var version = this.config['agentVersion']
-    if (!version) {
-      version = 'dev'
-    }
-    return this.get('agentName') + '/' + version
   }
 
   setConfig (properties) {
@@ -226,15 +214,10 @@ class Config {
   }
 
   isValid () {
-    var requiredKeys = ['serviceName', 'serverUrl']
-    var values = arrayMap(
-      requiredKeys,
-      functionBind(function (key) {
-        return (
-          this.config[key] === null || this.config[key] === undefined || this.config[key] === ''
-        )
-      }, this)
-    )
+    const requiredKeys = ['serviceName', 'serverUrl']
+    const values = arrayMap(requiredKeys, key => {
+      return this.config[key] == null || this.config[key] === ''
+    })
 
     return arrayIndexOf(values, true) === -1
   }

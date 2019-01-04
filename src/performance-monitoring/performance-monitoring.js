@@ -135,17 +135,13 @@ class PerformanceMonitoring {
   }
 
   prepareTransaction (transaction) {
-    var performanceMonitoring = this
     transaction.spans.sort(function (spanA, spanB) {
       return spanA._start - spanB._start
     })
 
-    if (performanceMonitoring._configService.get('groupSimilarSpans')) {
-      var similarSpanThreshold = performanceMonitoring._configService.get('similarSpanThreshold')
-      transaction.spans = performanceMonitoring.groupSmallContinuouslySimilarSpans(
-        transaction,
-        similarSpanThreshold
-      )
+    if (this._configService.get('groupSimilarSpans')) {
+      var similarSpanThreshold = this._configService.get('similarSpanThreshold')
+      transaction.spans = this.groupSmallContinuouslySimilarSpans(transaction, similarSpanThreshold)
     }
 
     transaction.spans = transaction.spans.filter(function (span) {
@@ -158,7 +154,7 @@ class PerformanceMonitoring {
       )
     })
 
-    performanceMonitoring.setTransactionContext(transaction)
+    this.setTransactionContext(transaction)
   }
 
   createTransactionDataModel (transaction) {

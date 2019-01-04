@@ -430,23 +430,6 @@ module.exports = {
     return -1
   },
 
-  functionBind: function (func, oThis) {
-    // Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
-    var aArgs = Array.prototype.slice.call(arguments, 2)
-    var FNOP = function () {}
-    var fBound = function () {
-      return func.apply(oThis, aArgs.concat(Array.prototype.slice.call(arguments)))
-    }
-
-    FNOP.prototype = func.prototype
-    fBound.prototype = new FNOP()
-    return fBound
-  },
-
-  getRandomInt: function (min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min
-  },
-
   isUndefined: function (obj) {
     return typeof obj === 'undefined'
   },
