@@ -244,6 +244,10 @@ function getPageMetadata () {
   }
 }
 
+function stripQueryStringFromUrl (url) {
+  return url && url.split('?')[0]
+}
+
 module.exports = {
   getPageMetadata: getPageMetadata,
 
@@ -462,7 +466,8 @@ module.exports = {
   setTag: setTag,
   noop: function () {},
   getTimeOrigin,
-  parseDtHeaderValue
+  parseDtHeaderValue,
+  stripQueryStringFromUrl
 }
 
 function isObject (value) {

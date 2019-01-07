@@ -418,14 +418,14 @@ describe('PerformanceMonitoring', function () {
       var tr = transactionService.startTransaction('fetch transaction', 'custom')
       spyOn(transactionService, 'startSpan').and.callThrough()
 
-      window.fetch('/').then(function () {
+      window.fetch('/?a=b&c=d').then(function () {
         setTimeout(() => {
           expect(tr.spans.length).toBe(1)
           expect(tr.spans[0].name).toBe('GET /')
           expect(tr.spans[0].context).toEqual({
             http: {
               method: 'GET',
-              url: '/',
+              url: '/?a=b&c=d',
               status_code: 200
             }
           })

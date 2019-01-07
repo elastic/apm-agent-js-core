@@ -37,7 +37,7 @@ class PerformanceMonitoring {
         task.source === patchUtils.FETCH_SOURCE
       ) {
         if (event === patchUtils.SCHEDULE && task.data) {
-          var spanName = task.data.method + ' ' + task.data.url
+          var spanName = task.data.method + ' ' + utils.stripQueryStringFromUrl(task.data.url)
           var span = transactionService.startSpan(spanName, 'external.http')
           if (span) {
             var isDtEnabled = configService.get('distributedTracing')
