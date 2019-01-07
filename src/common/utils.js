@@ -395,68 +395,32 @@ module.exports = {
     return A
   },
 
-  arrayIndexOf: function (arrayVal, searchElement, fromIndex) {
-    // Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
-    var k
-    if (arrayVal == null) {
-      throw new TypeError('"arrayVal" is null or not defined')
-    }
-
-    var o = Object(arrayVal)
-    var len = o.length >>> 0
-
-    if (len === 0) {
-      return -1
-    }
-
-    var n = +fromIndex || 0
-
-    if (Math.abs(n) === Infinity) {
-      n = 0
-    }
-
-    if (n >= len) {
-      return -1
-    }
-
-    k = Math.max(n >= 0 ? n : len - Math.abs(n), 0)
-
-    while (k < len) {
-      if (k in o && o[k] === searchElement) {
-        return k
-      }
-      k++
-    }
-    return -1
-  },
-
   isUndefined: function (obj) {
     return typeof obj === 'undefined'
   },
 
   noop: function () {},
   baseExtend,
-  getPageMetadata,
+  bytesToHex,
   isCORSSupported,
   isObject,
   isFunction,
   isPlatformSupported,
+  isDtHeaderValid,
   parseUrl,
   parseDtHeaderValue,
-  sanitizeString,
-  sanitizeObjectStrings,
   getNavigationTimingMarks,
   getPaintTimingMarks,
-  bytesToHex,
-  rng,
+  getDtHeaderValue,
+  getPageMetadata,
   getCurrentScript,
   getElasticScript,
   getTimeOrigin,
-  parseDtHeaderValue,
-  stripQueryStringFromUrl,
   generateRandomId,
+  rng,
   checkSameOrigin,
-  getDtHeaderValue,
-  isDtHeaderValid,
-  setTag
+  sanitizeString,
+  sanitizeObjectStrings,
+  setTag,
+  stripQueryStringFromUrl
 }

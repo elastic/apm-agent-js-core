@@ -5,7 +5,6 @@ const {
   arraySome,
   sanitizeString,
   setTag,
-  arrayIndexOf,
   merge
 } = require('./utils')
 const Subscription = require('../common/subscription')
@@ -215,11 +214,15 @@ class Config {
 
   isValid () {
     const requiredKeys = ['serviceName', 'serverUrl']
-    const values = arrayMap(requiredKeys, key => {
-      return this.config[key] == null || this.config[key] === ''
-    })
 
-    return arrayIndexOf(values, true) === -1
+    for (let i = 0; i < requiredKeys.length; i++) {
+      const key = requiredKeys[i]
+      if (this.config[key] == null || this.config[key] === '') {
+        return false
+      }
+    }
+
+    return true
   }
 }
 
