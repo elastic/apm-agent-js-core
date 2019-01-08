@@ -322,4 +322,13 @@ describe('lib/utils', function () {
       obj: '[object Object]'
     })
   })
+
+  it('should remove query strings from url', () => {
+    const urls = ['http://test.com/fetch?a=1&b=2', '/fetch?c=3&d=4', null, undefined, '']
+    const results = ['http://test.com/fetch', '/fetch', null, undefined, '']
+
+    urls.forEach((url, index) => {
+      expect(utils.stripQueryStringFromUrl(url)).toEqual(results[index])
+    })
+  })
 })
