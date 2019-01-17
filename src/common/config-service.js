@@ -187,12 +187,6 @@ class Config {
     setTag(key, value, this.config.context.tags)
   }
 
-  // deprecated
-  setTags (tags) {
-    console.log('APM: setTags is deprecated, please use addTags instead.')
-    this.addTags(tags)
-  }
-
   addTags (tags) {
     var keys = Object.keys(tags)
     keys.forEach(k => {
