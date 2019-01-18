@@ -71,6 +71,8 @@ class ErrorLogging {
 
     var currentTransaction = this._transactionService.getCurrentTransaction()
     if (currentTransaction) {
+      errorObject.trace_id = currentTransaction.traceId
+      errorObject.parent_id = currentTransaction.id
       errorObject.transaction_id = currentTransaction.id
       errorObject.transaction = {
         type: currentTransaction.type,

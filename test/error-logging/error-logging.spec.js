@@ -68,17 +68,29 @@ describe('ErrorLogging', function () {
     }
   })
 
-  it('should include transaction details on error', () => {
+  it('should include transaction details on error', done => {
+    spyOn(apmServer, 'sendErrors').and.callThrough()
     var transaction = transactionService.startTransaction('test', 'dummy')
     try {
       throw new Error('Test Error')
     } catch (error) {
-      var errorData = errorLogging.createErrorDataModel({ error })
-      expect(errorData.transaction_id).toEqual(transaction.id)
-      expect(errorData.transaction).toEqual({
-        type: transaction.type,
-        sampled: transaction.sampled
-      })
+      errorLogging.logErrorEvent({ error }, true).then(
+        () => {
+          expect(apmServer.sendErrors).toHaveBeenCalled()
+          var errors = apmServer.sendErrors.calls.argsFor(0)[0]
+          expect(errors.length).toBe(1)
+          var errorData = errors[0]
+          expect(errorData.transaction_id).toEqual(transaction.id)
+          expect(errorData.trace_id).toEqual(transaction.traceId)
+          expect(errorData.parent_id).toEqual(transaction.id)
+          expect(errorData.transaction).toEqual({
+            type: transaction.type,
+            sampled: transaction.sampled
+          })
+          done()
+        },
+        reason => fail(reason)
+      )
     }
   })
 
