@@ -233,13 +233,17 @@ describe('lib/utils', function () {
   })
 
   it('should generate correct DT headers', function () {
-    var span = new Span('test', 'test', { sampled: true, traceId: 'traceId' })
+    var span = new Span('test', 'test', {
+      sampled: true,
+      traceId: 'traceId',
+      parentId: 'transcationId'
+    })
     span.id = 'spanId'
     var headerValue = utils.getDtHeaderValue(span)
     expect(headerValue).toBe('00-traceId-spanId-01')
     span.sampled = false
     headerValue = utils.getDtHeaderValue(span)
-    expect(headerValue).toBe('00-traceId-spanId-00')
+    expect(headerValue).toBe('00-traceId-transcationId-00')
   })
 
   it('should validate DT header', function () {

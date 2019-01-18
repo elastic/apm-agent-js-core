@@ -70,14 +70,19 @@ function parseUrl (url) {
   }
 }
 
-const dtVersion = '00'
-const dtUnSampledFlags = '00'
-// 00000001 ->  '01' -> recorded
-const dtSampledFlags = '01'
 function getDtHeaderValue (span) {
-  if (span && span.traceId && span.id) {
+  const dtVersion = '00'
+  const dtUnSampledFlags = '00'
+  // 00000001 ->  '01' -> recorded
+  const dtSampledFlags = '01'
+  if (span && span.traceId && span.id && span.parentId) {
     var flags = span.sampled ? dtSampledFlags : dtUnSampledFlags
-    return dtVersion + '-' + span.traceId + '-' + span.id + '-' + flags
+    /**
+     * In the case of unsampled traces, propagate transaction id (parentId)
+     * instead of span id to the downstream
+     */
+    var id = span.sampled ? span.id : span.parentId
+    return dtVersion + '-' + span.traceId + '-' + id + '-' + flags
   }
 }
 
