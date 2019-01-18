@@ -6,19 +6,22 @@ describe('ErrorLogging', function () {
   var configService
   var apmServer
   var errorLogging
+  var transactionService
   beforeEach(function () {
     var serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
     configService.setConfig(apmTestConfig)
     apmServer = serviceFactory.getService('ApmServer')
     errorLogging = serviceFactory.getService('ErrorLogging')
+    transactionService = serviceFactory.getService('TransactionService')
   })
 
   it('should send error', function (done) {
+    var errorObject
     try {
       throw new Error('test error')
     } catch (error) {
-      var errorObject = errorLogging.createErrorDataModel({ error: error })
+      errorObject = errorLogging.createErrorDataModel({ error })
     }
     apmServer.sendErrors([errorObject]).then(
       function () {
@@ -45,7 +48,7 @@ describe('ErrorLogging', function () {
       error.anObject = obj
       error.aFunction = function noop () {}
       error.null = null
-      errorLogging.logErrorEvent({ error: error }, true).then(
+      errorLogging.logErrorEvent({ error }, true).then(
         function () {
           expect(apmServer.sendErrors).toHaveBeenCalled()
           var errors = apmServer.sendErrors.calls.argsFor(0)[0]
@@ -64,6 +67,21 @@ describe('ErrorLogging', function () {
       )
     }
   })
+
+  it('should include transaction details on error', () => {
+    var transaction = transactionService.startTransaction('test', 'dummy')
+    try {
+      throw new Error('Test Error')
+    } catch (error) {
+      var errorData = errorLogging.createErrorDataModel({ error })
+      expect(errorData.transaction_id).toEqual(transaction.id)
+      expect(errorData.transaction).toEqual({
+        type: transaction.type,
+        sampled: transaction.sampled
+      })
+    }
+  })
+
   function createErrorEvent (message) {
     var errorEvent
     var errorEventData = {
@@ -170,8 +188,8 @@ describe('ErrorLogging', function () {
     try {
       throw new Error('unittest error')
     } catch (error) {
-      errorLogging.logErrorEvent({ error: error })
-      errorLogging.logErrorEvent({ error: error })
+      errorLogging.logErrorEvent({ error })
+      errorLogging.logErrorEvent({ error })
       errorLogging.logError(error)
       errorLogging.logError('test error')
       expect(apmServer.sendErrors).not.toHaveBeenCalled()
@@ -189,8 +207,8 @@ describe('ErrorLogging', function () {
     try {
       throw new Error('unittest error')
     } catch (error) {
-      errorLogging.logErrorEvent({ error: error })
-      errorLogging.logErrorEvent({ error: error })
+      errorLogging.logErrorEvent({ error })
+      errorLogging.logErrorEvent({ error })
       errorLogging.logError(error)
       errorLogging.logError('test error')
       expect(apmServer.sendErrors).not.toHaveBeenCalled()

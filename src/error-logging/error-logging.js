@@ -3,10 +3,11 @@ var StackTraceService = require('./stack-trace-service')
 var utils = require('../common/utils')
 
 class ErrorLogging {
-  constructor (apmServer, configService, loggingService) {
+  constructor (apmServer, configService, loggingService, transactionService) {
     this._apmServer = apmServer
     this._configService = configService
     this._loggingService = loggingService
+    this._transactionService = transactionService
     this._stackTraceService = new StackTraceService(configService, loggingService)
   }
 
@@ -66,6 +67,15 @@ class ErrorLogging {
         type: utils.sanitizeString(errorType, stringLimit, false)
       },
       context: context
+    }
+
+    var currentTransaction = this._transactionService.getCurrentTransaction()
+    if (currentTransaction) {
+      errorObject.transaction_id = currentTransaction.id
+      errorObject.transaction = {
+        type: currentTransaction.type,
+        sampled: currentTransaction.sampled
+      }
     }
     return errorObject
   }
