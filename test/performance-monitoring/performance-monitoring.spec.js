@@ -326,6 +326,18 @@ describe('PerformanceMonitoring', function () {
     expect(result).toBe(true)
   })
 
+  it('should not filter unsampled transactions', function () {
+    const tr = new Transaction('unsampled', 'test', { transactionSampleRate: 0 })
+    tr.end()
+    if (tr._end && tr._end === tr._start) {
+      tr._end += 100
+    }
+    expect(tr.duration()).toBeGreaterThan(0)
+    expect(tr.spans.length).toBe(0)
+    const result = performanceMonitoring.filterTransaction(tr)
+    expect(result).toBe(true)
+  })
+
   it('should filter the transactions with duration above threshold', function () {
     var threshold = configService.get('transactionDurationThreshold')
     var tr = new Transaction('/test/outlier', 'page-load-slow', configService.config)
