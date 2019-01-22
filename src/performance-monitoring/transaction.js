@@ -126,6 +126,10 @@ class Transaction extends SpanBase {
     this.spans = this.spans.concat(existingSpans)
   }
 
+  resetSpans () {
+    this.spans = []
+  }
+
   _onSpanEnd (span) {
     this.spans.push(span)
     // Remove span from _activeSpans

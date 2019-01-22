@@ -326,7 +326,7 @@ describe('PerformanceMonitoring', function () {
     expect(result).toBe(true)
   })
 
-  it('should not filter unsampled transactions', function () {
+  it('should not filter unsampled transactions with spans', function () {
     const tr = new Transaction('unsampled', 'test', { transactionSampleRate: 0 })
     tr.end()
     if (tr._end && tr._end === tr._start) {
@@ -334,8 +334,17 @@ describe('PerformanceMonitoring', function () {
     }
     expect(tr.duration()).toBeGreaterThan(0)
     expect(tr.spans.length).toBe(0)
-    const result = performanceMonitoring.filterTransaction(tr)
-    expect(result).toBe(true)
+    expect(performanceMonitoring.filterTransaction(tr)).toBe(false)
+
+    const tr2 = new Transaction('unsampled', 'test', { transactionSampleRate: 0 })
+    tr2.startSpan('span1', 'type1').end()
+    tr2.end()
+    if (tr2._end && tr2._end === tr2._start) {
+      tr2._end += 100
+    }
+    expect(tr2.spans.length).toBe(1)
+    expect(performanceMonitoring.filterTransaction(tr2)).toBe(true)
+    expect(tr2.spans.length).toBe(0)
   })
 
   it('should filter the transactions with duration above threshold', function () {
