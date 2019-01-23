@@ -23,10 +23,10 @@
  *
  */
 
-var Span = require('./span')
-var utils = require('../common/utils')
+const Span = require('./span')
+const Url = require('../common/url')
 
-var eventPairs = [
+const eventPairs = [
   ['domainLookupStart', 'domainLookupEnd', 'Domain lookup'],
   ['connectStart', 'connectEnd', 'Making a connection to the server'],
   ['requestStart', 'responseEnd', 'Requesting and receiving the document'],
@@ -34,8 +34,8 @@ var eventPairs = [
   ['domContentLoadedEventStart', 'domContentLoadedEventEnd', 'Fire "DOMContentLoaded" event'],
   ['loadEventStart', 'loadEventEnd', 'Fire "load" event']
 ]
+const spanThreshold = 5 * 60 * 1000
 
-var spanThreshold = 5 * 60 * 1000
 function isValidSpan (transaction, span) {
   var d = span.duration()
   return (
@@ -112,8 +112,9 @@ function createResourceTimingSpans (entries, filterUrls) {
         start < spanThreshold &&
         end < spanThreshold
       ) {
-        var parsedUrl = utils.parseUrl(entry.name)
-        var span = new Span(parsedUrl.path || entry.name, kind)
+        var parsedUrl = new Url(entry.name)
+        var spanName = parsedUrl.origin + parsedUrl.path
+        var span = new Span(spanName || entry.name, kind)
         span.addContext({
           http: {
             url: entry.name

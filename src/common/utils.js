@@ -25,7 +25,7 @@
 
 const constants = require('./constants')
 const slice = [].slice
-const URL = require('url-parse/dist/url-parse')
+const Url = require('../common/url')
 const rng = require('uuid/lib/rng-browser')
 
 function isCORSSupported () {
@@ -62,39 +62,10 @@ function bytesToHex (buf, offset) {
   ].join('')
 }
 
-function parseUrl (url) {
-  // source: angular.js/$LocationProvider
-  var PATH_MATCH = /^([^?#]*)(\?([^#]*))?(#(.*))?$/
-  var match = PATH_MATCH.exec(url)
-  var path = match[1] || ''
-  var queryString = match[3] || ''
-  var hash = match[5] ? '#' + match[5] : ''
-
-  var protocol = ''
-  if (url.indexOf('://') > -1) {
-    protocol = url.split('://')[0] + ':'
-  }
-
-  var params = {}
-  var queries = queryString.split('&')
-  for (var i = 0, l = queries.length; i < l; i++) {
-    var query = queries[i]
-    if (query === '' || typeof query === 'undefined' || query === null) {
-      continue
-    }
-    var keyvalue = queries[i].split('=')
-    var key = keyvalue.shift()
-    params[key] = keyvalue.join('=')
-  }
-  return {
-    protocol: protocol,
-    path: path,
-    queryString: queryString,
-    queryStringParsed: params,
-    hash: hash
-  }
-}
-
+const dtVersion = '00'
+const dtUnSampledFlags = '00'
+// 00000001 ->  '01' -> recorded
+const dtSampledFlags = '01'
 function getDtHeaderValue (span) {
   const dtVersion = '00'
   const dtUnSampledFlags = '00'
@@ -133,10 +104,10 @@ function isDtHeaderValid (header) {
 }
 
 function checkSameOrigin (source, target) {
-  var isSame = false
+  let isSame = false
   if (typeof target === 'string') {
-    var src = new URL(source)
-    var tar = new URL(target)
+    const src = new Url(source)
+    const tar = new Url(target)
     isSame = src.origin === tar.origin
   } else if (Array.isArray(target)) {
     target.forEach(function (t) {
@@ -463,7 +434,6 @@ module.exports = {
   isFunction,
   isPlatformSupported,
   isDtHeaderValid,
-  parseUrl,
   parseDtHeaderValue,
   getNavigationTimingMarks,
   getPaintTimingMarks,
