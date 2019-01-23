@@ -62,10 +62,6 @@ function bytesToHex (buf, offset) {
   ].join('')
 }
 
-const dtVersion = '00'
-const dtUnSampledFlags = '00'
-// 00000001 ->  '01' -> recorded
-const dtSampledFlags = '01'
 function getDtHeaderValue (span) {
   const dtVersion = '00'
   const dtUnSampledFlags = '00'

@@ -5,15 +5,14 @@ describe('Url parser', function () {
     var result = new Url(
       '/path?param=value&param2=value2&0=zero&foo&empty=&key=double=double&undefined'
     )
-    var expected = {
-      host: 'localhost:9876',
-      origin: 'http://localhost:9876',
-      protocol: 'http:',
-      path: '/path',
-      query: '?param=value&param2=value2&0=zero&foo&empty=&key=double=double&undefined',
-      hash: ''
-    }
-    expect(result).toEqual(expected)
+    expect(result).toEqual(
+      jasmine.objectContaining({
+        protocol: 'http:',
+        path: '/path',
+        query: '?param=value&param2=value2&0=zero&foo&empty=&key=double=double&undefined',
+        hash: ''
+      })
+    )
   })
 
   it('should parse absolute url', function () {
