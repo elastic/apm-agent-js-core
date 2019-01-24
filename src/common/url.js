@@ -59,11 +59,8 @@ class Url {
     const relative = !protocol && !slashes
     const location = this.getLocation()
     const instructions = RULES.slice()
-    const result = {}
     // Sanitize what is left of the address
     address = address.replace('\\', '/')
-
-    result.protocol = protocol || location.protocol || ''
 
     let index
     for (let i = 0; i < instructions.length; i++) {
@@ -71,33 +68,33 @@ class Url {
       const parse = instruction[0]
       const key = instruction[1]
 
-      /** NaN condition trick */
-      // eslint-disable-next-line
-      if (parse !== parse) {
-        result[key] = address
-      } else if (typeof parse === 'string') {
-        if (~(index = address.indexOf(parse))) {
-          result[key] = address.slice(index)
+      if (typeof parse === 'string') {
+        index = address.indexOf(parse)
+        if (~index) {
+          this[key] = address.slice(index)
           address = address.slice(0, index)
         }
+      } else {
+        /** NaN condition */
+        this[key] = address
       }
       /**
        * Default values for all keys from location if url is relative
        */
-      result[key] = result[key] || (relative && instruction[2] ? location[key] || '' : '')
+      this[key] = this[key] || (relative && instruction[2] ? location[key] || '' : '')
       /**
        * host should be lowercased so they can be used to
        * create a proper `origin`.
        */
-      if (instruction[2]) result[key] = result[key].toLowerCase()
+      if (instruction[2]) this[key] = this[key].toLowerCase()
     }
 
-    result.origin =
-      result.protocol && result.host && result.protocol !== 'file:'
-        ? result.protocol + '//' + result.host
-        : 'null'
+    this.protocol = protocol || location.protocol || ''
 
-    return result
+    this.origin =
+      this.protocol && this.host && this.protocol !== 'file:'
+        ? this.protocol + '//' + this.host
+        : 'null'
   }
 
   getLocation () {
