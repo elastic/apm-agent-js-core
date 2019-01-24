@@ -298,6 +298,20 @@ function getCurrentScript () {
   }
 }
 
+function extend (dst) {
+  return baseExtend(dst, slice.call(arguments, 1), false)
+}
+
+function merge (dst) {
+  return baseExtend(dst, slice.call(arguments, 1), true)
+}
+
+function isUndefined (obj) {
+  return typeof obj === 'undefined'
+}
+
+function noop () {}
+
 function find (array, predicate, thisArg) {
   // Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
   if (array == null) {
@@ -329,104 +343,10 @@ function removeInvalidChars (key) {
 }
 
 module.exports = {
-  extend: function extend (dst) {
-    return baseExtend(dst, slice.call(arguments, 1), false)
-  },
-
-  merge: function merge (dst) {
-    return baseExtend(dst, slice.call(arguments, 1), true)
-  },
-
-  arrayReduce: function (arrayValue, callback, value) {
-    // Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce
-    if (arrayValue == null) {
-      throw new TypeError('Array.prototype.reduce called on null or undefined')
-    }
-    if (typeof callback !== 'function') {
-      throw new TypeError(callback + ' is not a function')
-    }
-    var t = Object(arrayValue)
-    var len = t.length >>> 0
-    var k = 0
-
-    if (!value) {
-      while (k < len && !(k in t)) {
-        k++
-      }
-      if (k >= len) {
-        throw new TypeError('Reduce of empty array with no initial value')
-      }
-      value = t[k++]
-    }
-
-    for (; k < len; k++) {
-      if (k in t) {
-        value = callback(value, t[k], k, t)
-      }
-    }
-    return value
-  },
-
-  arraySome: function (value, callback, thisArg) {
-    // Source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
-    if (value == null) {
-      throw new TypeError('Array.prototype.some called on null or undefined')
-    }
-
-    if (typeof callback !== 'function') {
-      throw new TypeError()
-    }
-
-    var t = Object(value)
-    var len = t.length >>> 0
-
-    if (!thisArg) {
-      thisArg = void 0
-    }
-
-    for (var i = 0; i < len; i++) {
-      if (i in t && callback.call(thisArg, t[i], i, t)) {
-        return true
-      }
-    }
-    return false
-  },
-
-  arrayMap: function (arrayValue, callback, thisArg) {
-    // Source https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Map
-    var T, A, k
-
-    if (this == null) {
-      throw new TypeError(' this is null or not defined')
-    }
-    var O = Object(arrayValue)
-    var len = O.length >>> 0
-
-    if (typeof callback !== 'function') {
-      throw new TypeError(callback + ' is not a function')
-    }
-    if (arguments.length > 1) {
-      T = thisArg
-    }
-    A = new Array(len)
-    k = 0
-    while (k < len) {
-      var kValue, mappedValue
-      if (k in O) {
-        kValue = O[k]
-        mappedValue = callback.call(T, kValue, k, O)
-        A[k] = mappedValue
-      }
-      k++
-    }
-    return A
-  },
-
-  isUndefined: function (obj) {
-    return typeof obj === 'undefined'
-  },
-
-  noop: function () {},
+  extend,
+  merge,
+  isUndefined,
+  noop,
   baseExtend,
   bytesToHex,
   isCORSSupported,

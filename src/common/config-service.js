@@ -23,15 +23,7 @@
  *
  */
 
-const {
-  getCurrentScript,
-  arrayMap,
-  arrayReduce,
-  arraySome,
-  sanitizeString,
-  setTag,
-  merge
-} = require('./utils')
+const { getCurrentScript, sanitizeString, setTag, merge } = require('./utils')
 const Subscription = require('../common/subscription')
 const constants = require('./constants')
 
@@ -54,11 +46,14 @@ function getDataAttributesFromNode (node) {
       var key = attr.nodeName.match(dataRegex)[1]
 
       // camelCase key
-      key = arrayMap(key.split('-'), function (group, index) {
-        return index > 0 ? group.charAt(0).toUpperCase() + group.substring(1) : group
-      }).join('')
+      var camelCasedkey = key
+        .split('-')
+        .map((value, index) => {
+          return index > 0 ? value.charAt(0).toUpperCase() + value.substring(1) : value
+        })
+        .join('')
 
-      dataAttrs[key] = attr.value || attr.nodeValue
+      dataAttrs[camelCasedkey] = attr.value || attr.nodeValue
     }
   }
 
@@ -147,13 +142,9 @@ class Config {
   }
 
   get (key) {
-    return arrayReduce(
-      key.split('.'),
-      function (obj, i) {
-        return obj && obj[i]
-      },
-      this.config
-    )
+    return key.split('.').reduce((obj, objKey) => {
+      return obj && obj[objKey]
+    }, this.config)
   }
 
   getEndpointUrl () {
@@ -166,9 +157,10 @@ class Config {
     var maxLevel = levels.length - 1
     var target = this.config
 
-    arraySome(levels, function (level, i) {
-      if (typeof level === 'undefined') {
-        return true
+    for (let i = 0; i < maxLevel + 1; i++) {
+      const level = levels[i]
+      if (!level) {
+        continue
       }
       if (i === maxLevel) {
         target[level] = value
@@ -177,7 +169,7 @@ class Config {
         target[level] = obj
         target = obj
       }
-    })
+    }
   }
 
   setUserContext (userContext) {
