@@ -17,14 +17,16 @@ describe('Url parser', function () {
 
   it('should parse absolute url', function () {
     var result = new Url('http://test.com/path.js?param=value')
-    expect(result).toEqual({
-      protocol: 'http:',
-      path: '/path.js',
-      query: '?param=value',
-      hash: '',
-      host: 'test.com',
-      origin: 'http://test.com'
-    })
+    expect(result).toEqual(
+      jasmine.objectContaining({
+        protocol: 'http:',
+        path: '/path.js',
+        query: '?param=value',
+        hash: '',
+        host: 'test.com',
+        origin: 'http://test.com'
+      })
+    )
   })
 
   it('should parse url with fragment part', function () {
