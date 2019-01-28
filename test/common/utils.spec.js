@@ -286,4 +286,10 @@ describe('lib/utils', function () {
     result = utils.find(2, function () {})
     expect(result).toBe(undefined)
   })
+
+  it('should remove invalid characters', () => {
+    expect(utils.removeInvalidChars('invalid*')).toEqual('invalid_')
+    expect(utils.removeInvalidChars('invalid1.invalid2')).toEqual('invalid1_invalid2')
+    expect(utils.removeInvalidChars('invalid"')).toEqual('invalid_')
+  })
 })

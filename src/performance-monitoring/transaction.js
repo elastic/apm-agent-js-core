@@ -25,13 +25,20 @@
 
 const Span = require('./span')
 const SpanBase = require('./span-base')
-
-var utils = require('../common/utils')
+const {
+  generateRandomId,
+  getNavigationTimingMarks,
+  getPaintTimingMarks,
+  merge,
+  extend,
+  getPageMetadata,
+  removeInvalidChars
+} = require('../common/utils')
 
 class Transaction extends SpanBase {
   constructor (name, type, options) {
     super(name, type, options)
-    this.traceId = utils.generateRandomId()
+    this.traceId = generateRandomId()
     this.marks = undefined
 
     this.spans = []
@@ -47,8 +54,8 @@ class Transaction extends SpanBase {
   }
 
   addNavigationTimingMarks () {
-    var marks = utils.getNavigationTimingMarks()
-    var paintMarks = utils.getPaintTimingMarks()
+    var marks = getNavigationTimingMarks()
+    var paintMarks = getPaintTimingMarks()
     if (marks) {
       var agent = {
         timeToFirstByte: marks.responseStart,
@@ -63,15 +70,15 @@ class Transaction extends SpanBase {
   }
 
   addMarks (obj) {
-    this.marks = utils.merge(this.marks || {}, obj)
+    this.marks = merge(this.marks || {}, obj)
   }
 
   mark (key) {
-    var skey = key.replace(/[.*]/g, '_')
+    var skey = removeInvalidChars(key)
     var now = window.performance.now() - this._start
     var custom = {}
     custom[skey] = now
-    this.addMarks({ custom: custom })
+    this.addMarks({ custom })
   }
 
   redefine (name, type, options) {
@@ -85,7 +92,7 @@ class Transaction extends SpanBase {
       return
     }
     var transaction = this
-    var opts = utils.extend({}, options)
+    var opts = extend({}, options)
 
     opts.onEnd = function (trc) {
       transaction._onSpanEnd(trc)
@@ -125,7 +132,7 @@ class Transaction extends SpanBase {
       span.end()
     }
 
-    var metadata = utils.getPageMetadata()
+    var metadata = getPageMetadata()
     this.addContext(metadata)
 
     this._adjustStartToEarliestSpan()

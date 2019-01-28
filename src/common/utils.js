@@ -148,7 +148,7 @@ function sanitizeString (value, limit, required, placeholder) {
 
 function setTag (key, value, obj) {
   if (!obj || !key) return
-  var skey = key.replace(/[.*]/g, '_')
+  var skey = removeInvalidChars(key)
   obj[skey] = sanitizeString(value, constants.serverStringLimit)
   return obj
 }
@@ -324,6 +324,10 @@ function find (array, predicate, thisArg) {
   return undefined
 }
 
+function removeInvalidChars (key) {
+  return key.replace(/[.*"]/g, '_')
+}
+
 module.exports = {
   extend: function extend (dst) {
     return baseExtend(dst, slice.call(arguments, 1), false)
@@ -445,5 +449,6 @@ module.exports = {
   sanitizeObjectStrings,
   setTag,
   stripQueryStringFromUrl,
-  find
+  find,
+  removeInvalidChars
 }

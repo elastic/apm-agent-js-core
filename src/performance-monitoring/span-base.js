@@ -23,7 +23,7 @@
  *
  */
 
-const utils = require('../common/utils')
+const { isUndefined, generateRandomId, setTag, merge } = require('../common/utils')
 class SpanBase {
   // context
 
@@ -31,7 +31,7 @@ class SpanBase {
     this.options = options || {}
     this.name = name || this.options.name || 'Unknown'
     this.type = type || this.options.type || 'custom'
-    this.id = this.options.id || utils.generateRandomId(16)
+    this.id = this.options.id || generateRandomId(16)
     this.traceId = this.options.traceId
     this.sampled = this.options.sampled
     this.timestamp = this.options.timestamp || Date.now()
@@ -55,14 +55,14 @@ class SpanBase {
     }
     var keys = Object.keys(tags)
     keys.forEach(function (k) {
-      utils.setTag(k, tags[k], ctx.tags)
+      setTag(k, tags[k], ctx.tags)
     })
   }
 
   addContext (context) {
     if (!context) return
     this.ensureContext()
-    utils.merge(this.context, context)
+    merge(this.context, context)
   }
 
   end () {
@@ -82,7 +82,7 @@ class SpanBase {
   }
 
   duration () {
-    if (utils.isUndefined(this._end) || utils.isUndefined(this._start)) {
+    if (isUndefined(this._end) || isUndefined(this._start)) {
       return null
     }
 
