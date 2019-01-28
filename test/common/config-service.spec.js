@@ -177,4 +177,17 @@ describe('ConfigService', function () {
       date: String(date)
     })
   })
+
+  it('should set config from script data attributes', () => {
+    const script = document.createElement('script')
+    script.src = './elastic-script.js'
+    script.setAttribute('data-service-name', 'js-core')
+    script.setAttribute('data-capture-page-load', 'false')
+    document.head.appendChild(script)
+
+    const configServiceFromScript = new ConfigService()
+    configServiceFromScript.init()
+    expect(configServiceFromScript.get('serviceName')).toBe('js-core')
+    expect(configServiceFromScript.get('capturePageLoad')).toBe('false')
+  })
 })
