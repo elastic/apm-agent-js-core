@@ -75,20 +75,23 @@ function createResourceTimingSpans (entries, filterUrls) {
   var spans = []
   for (var i = 0; i < entries.length; i++) {
     var entry = entries[i]
-    if ((entry.initiatorType && entry.initiatorType === 'xmlhttprequest') || !entry.name) {
+    var { initiatorType, name, startTime, responseEnd } = entry
+    /**
+     * Skipping the timing information of API calls because of auto patching XHR and Fetch
+     */
+    if (initiatorType === 'xmlhttprequest' || initiatorType === 'fetch' || !entry.name) {
       continue
     } else if (
-      entry.initiatorType !== 'css' &&
-      entry.initiatorType !== 'img' &&
-      entry.initiatorType !== 'script' &&
-      entry.initiatorType !== 'link'
+      initiatorType !== 'css' &&
+      initiatorType !== 'img' &&
+      initiatorType !== 'script' &&
+      initiatorType !== 'link'
     ) {
-      // is web request? test for css/img before the expensive operation
+      // is ajax request? test for css/img before the expensive operation
       var foundAjaxReq = false
       for (var j = 0; j < filterUrls.length; j++) {
-        // entry.name.endsWith(ajaxUrls[j])
-        var idx = entry.name.lastIndexOf(filterUrls[j])
-        if (idx > -1 && idx === entry.name.length - filterUrls[j].length) {
+        var idx = name.lastIndexOf(filterUrls[j])
+        if (idx > -1 && idx === name.length - filterUrls[j].length) {
           foundAjaxReq = true
           break
         }
@@ -98,11 +101,11 @@ function createResourceTimingSpans (entries, filterUrls) {
       }
     } else {
       var kind = 'resource'
-      if (entry.initiatorType) {
-        kind += '.' + entry.initiatorType
+      if (initiatorType) {
+        kind += '.' + initiatorType
       }
-      var start = entry.startTime
-      var end = entry.responseEnd
+      var start = startTime
+      var end = responseEnd
       if (
         typeof start === 'number' &&
         typeof end === 'number' &&
@@ -112,12 +115,12 @@ function createResourceTimingSpans (entries, filterUrls) {
         start < spanThreshold &&
         end < spanThreshold
       ) {
-        var parsedUrl = new Url(entry.name)
+        var parsedUrl = new Url(name)
         var spanName = parsedUrl.origin + parsedUrl.path
-        var span = new Span(spanName || entry.name, kind)
+        var span = new Span(spanName || name, kind)
         span.addContext({
           http: {
-            url: entry.name
+            url: name
           }
         })
         span._start = start
@@ -173,7 +176,7 @@ function captureHardNavigation (transaction) {
 }
 
 module.exports = {
-  captureHardNavigation: captureHardNavigation,
-  createNavigationTimingSpans: createNavigationTimingSpans,
-  createResourceTimingSpans: createResourceTimingSpans
+  captureHardNavigation,
+  createNavigationTimingSpans,
+  createResourceTimingSpans
 }

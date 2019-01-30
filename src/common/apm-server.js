@@ -23,11 +23,11 @@
  *
  */
 
-var Queue = require('./queue')
-var throttle = require('./throttle')
-var utils = require('./utils')
-var NDJSON = require('./ndjson')
-var xhrIgnore = require('./patching/patch-utils').XHR_IGNORE
+const Queue = require('./queue')
+const throttle = require('./throttle')
+const { sanitizeString } = require('./utils')
+const NDJSON = require('./ndjson')
+const { XHR_IGNORE } = require('./patching/patch-utils')
 
 class ApmServer {
   constructor (configService, loggingService) {
@@ -62,8 +62,8 @@ class ApmServer {
     var stringLimit = cfg.get('serverStringLimit')
 
     var serviceObject = {
-      name: utils.sanitizeString(cfg.get('serviceName'), stringLimit, true),
-      version: utils.sanitizeString(cfg.get('serviceVersion'), stringLimit, false),
+      name: sanitizeString(cfg.get('serviceName'), stringLimit, true),
+      version: sanitizeString(cfg.get('serviceVersion'), stringLimit, false),
       agent: {
         name: cfg.get('agentName'),
         version: cfg.get('agentVersion')
@@ -84,7 +84,7 @@ class ApmServer {
   _makeHttpRequest (method, url, payload, headers) {
     return new Promise(function (resolve, reject) {
       var xhr = new window.XMLHttpRequest()
-      xhr[xhrIgnore] = true
+      xhr[XHR_IGNORE] = true
       xhr.open(method, url, true)
       xhr.timeout = 10000
 
