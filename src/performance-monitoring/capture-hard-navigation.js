@@ -24,7 +24,7 @@
  */
 
 const Span = require('./span')
-const Url = require('../common/url')
+const { stripQueryStringFromUrl } = require('../common/utils')
 
 const eventPairs = [
   ['domainLookupStart', 'domainLookupEnd', 'Domain lookup'],
@@ -115,14 +115,16 @@ function createResourceTimingSpans (entries, filterUrls) {
         start < spanThreshold &&
         end < spanThreshold
       ) {
-        var parsedUrl = new Url(name)
-        var spanName = parsedUrl.origin + parsedUrl.path
-        var span = new Span(spanName || name, kind)
-        span.addContext({
-          http: {
-            url: name
-          }
-        })
+        var spanName = stripQueryStringFromUrl(name)
+        var span = new Span(spanName, kind)
+        /**
+         * Add context information when the span name and entry name are different
+         */
+        if (spanName !== name) {
+          span.addContext({
+            http: { url: name }
+          })
+        }
         span._start = start
         span.ended = true
         span._end = end

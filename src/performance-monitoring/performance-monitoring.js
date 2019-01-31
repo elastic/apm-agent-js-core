@@ -204,12 +204,12 @@ class PerformanceMonitoring {
   }
 
   createTransactionDataModel (transaction) {
-    var configContext = this._configService.get('context')
-    var stringLimit = this._configService.get('serverStringLimit')
-    var transactionStart = transaction._start
+    const configContext = this._configService.get('context')
+    const stringLimit = this._configService.get('serverStringLimit')
+    const transactionStart = transaction._start
 
-    var spans = transaction.spans.map(function (span) {
-      var context
+    const spans = transaction.spans.map(function (span) {
+      let context
       if (span.context) {
         context = sanitizeObjectStrings(span.context, stringLimit)
       }
@@ -225,19 +225,19 @@ class PerformanceMonitoring {
         sync: span.sync,
         start: span._start - transactionStart,
         duration: span.duration(),
-        context: context
+        context
       }
     })
 
-    var context = merge({}, configContext, transaction.context)
+    const context = merge({}, configContext, transaction.context)
     return {
       id: transaction.id,
       trace_id: transaction.traceId,
       name: sanitizeString(transaction.name, stringLimit, false),
       type: sanitizeString(transaction.type, stringLimit, true),
       duration: transaction.duration(),
-      spans: spans,
-      context: context,
+      spans,
+      context,
       marks: transaction.marks,
       span_count: {
         started: spans.length
