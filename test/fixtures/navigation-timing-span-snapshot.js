@@ -25,6 +25,13 @@
 
 module.exports = [
   {
+    name: 'http://beacon.test',
+    type: 'resource.beacon',
+    ended: true,
+    _end: 168.25,
+    _start: 25.220000000000002
+  },
+  {
     name: 'http://testing.com',
     type: 'resource.script',
     ended: true,

@@ -25,13 +25,6 @@
 
 module.exports = [
   {
-    name: 'should not be seen',
-    initiatorType: null,
-    entryType: 'resource',
-    startTime: 25.220000000000002,
-    responseEnd: 168.25
-  },
-  {
     name: null,
     initiatorType: 'script',
     entryType: 'resource',
@@ -85,6 +78,20 @@ module.exports = [
     initiatorType: 'script',
     entryType: 'resource',
     startTime: Number(new Date()),
+    responseEnd: 168.25
+  },
+  {
+    name: 'http://ajax-filter.test',
+    initiatorType: null,
+    entryType: 'resource',
+    startTime: 25.220000000000002,
+    responseEnd: 168.25
+  },
+  {
+    name: 'http://beacon.test',
+    initiatorType: 'beacon',
+    entryType: 'resource',
+    startTime: 25.220000000000002,
     responseEnd: 168.25
   },
   {

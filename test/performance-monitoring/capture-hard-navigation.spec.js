@@ -22,13 +22,11 @@
  * THE SOFTWARE.
  *
  */
+const navigationTiming = require('../../src/performance-monitoring/capture-hard-navigation')
+const Transaction = require('../../src/performance-monitoring/transaction')
 
-var navigationTiming = require('../../src/performance-monitoring/capture-hard-navigation')
-var Transaction = require('../../src/performance-monitoring/transaction')
-
-var resourceEntries = require('../fixtures/resource-entries')
-
-var spanSnapshot = require('./navigation-timing-span-snapshot').map(mapSpan)
+const resourceEntries = require('../fixtures/resource-entries')
+const spanSnapshot = require('../fixtures/navigation-timing-span-snapshot').map(mapSpan)
 
 function mapSpan (s) {
   return { name: s.name, _end: s._end, _start: s._start }
@@ -203,7 +201,9 @@ describe('navigationTiming', function () {
   })
 
   it('should createResourceTimingSpans', function () {
-    var spans = navigationTiming.createResourceTimingSpans(resourceEntries, [])
+    var spans = navigationTiming.createResourceTimingSpans(resourceEntries, [
+      'http://ajax-filter.test'
+    ])
     expect(spans.map(mapSpan)).toEqual(spanSnapshot)
   })
 

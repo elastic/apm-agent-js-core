@@ -23,11 +23,11 @@
  *
  */
 
-var Transaction = require('./transaction')
-var utils = require('../common/utils')
-var Subscription = require('../common/subscription')
+const Transaction = require('./transaction')
+const utils = require('../common/utils')
+const Subscription = require('../common/subscription')
+const { captureHardNavigation } = require('./capture-hard-navigation')
 
-var captureHardNavigation = require('./capture-hard-navigation').captureHardNavigation
 class TransactionService {
   constructor (logger, config) {
     if (typeof config === 'undefined') {
